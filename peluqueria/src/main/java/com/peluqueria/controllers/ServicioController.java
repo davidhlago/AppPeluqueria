@@ -1,4 +1,4 @@
-package com.peluqueria.controller;
+package com.peluqueria.controllers;
 
 import com.peluqueria.entity.Servicio;
 import com.peluqueria.service.ServicioService;
