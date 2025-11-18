@@ -1,13 +1,12 @@
-/*package com.peluqueria.controllers;
+/**package com.peluqueria.controllers;
 
 import com.peluqueria.entity.Usuario;
-import com.peluqueria.payload.request.LoginRequest;
-import com.peluqueria.payload.request.SignupRequest;
+import com.peluqueria.payload.request.LogInRequest;
+import com.peluqueria.payload.request.SignUpRequest;
 import com.peluqueria.payload.response.JwtResponse;
 import com.peluqueria.payload.response.MessageResponse;
-import com.peluqueria.repository.UserRepository; // Repositorio para buscar/guardar User
+import com.peluqueria.repository.UsuarioRepository; // Repositorio para buscar/guardar User
 import com.peluqueria.security.jwt.JwtUtils;
-import com.peluqueria.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,13 +26,13 @@ import java.util.stream.Collectors;
 public class AuthController { // Clase AuthController
 
     @Autowired AuthenticationManager authenticationManager;
-    @Autowired UserRepository userRepository;
+    @Autowired UsuarioRepository userRepository;
     @Autowired PasswordEncoder encoder;
     @Autowired JwtUtils jwtUtils;
 
     // --- 1. ENDPOINT DE INICIO DE SESIÓN ---
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LogInRequest loginRequest) {
 
         // 1. Autentica al usuario usando email y password
         Authentication authentication = authenticationManager.authenticate(
@@ -62,7 +61,7 @@ public class AuthController { // Clase AuthController
 
     // --- 2. ENDPOINT DE REGISTRO DE USUARIOS ---
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signupRequest) {
 
         // 1. Validación: Verifica si el email ya está en uso
         if (userRepository.findByEmail(signupRequest.getEmail()).isPresent()) {
@@ -70,7 +69,7 @@ public class AuthController { // Clase AuthController
         }
 
         // 2. Crea la entidad User y codifica la contraseña
-        User user = new User(
+        Usuario user = new Usuario(
                 signupRequest.getNombre(),
                 signupRequest.getApellidos(), // AÑADIDO: Campo apellidos
                 signupRequest.getEmail(),
@@ -86,4 +85,4 @@ public class AuthController { // Clase AuthController
 
         return ResponseEntity.ok(new MessageResponse("Usuario registrado exitosamente!"));
     }
-}*/
+}**/
