@@ -1,6 +1,6 @@
 package com.peluqueria.service;
 
-import com.peluqueria.project.modelo.Usuario;
+import com.peluqueria.entity.Usuario;
 import java.util.List;
 
 public interface ServicioUsuario {

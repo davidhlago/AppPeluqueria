@@ -1,6 +1,6 @@
 package com.peluqueria.service;
 
-import com.peluqueria.project.modelo.Grupo;
+import com.peluqueria.entity.Grupo;
 import java.util.List;
 
 public interface ServicioGrupo {

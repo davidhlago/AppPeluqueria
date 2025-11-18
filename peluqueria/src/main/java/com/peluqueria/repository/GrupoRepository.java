@@ -1,6 +1,6 @@
 package com.peluqueria.repository;
 
-import com.peluqueria.project.modelo.Grupo;
+import com.peluqueria.entity.Grupo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

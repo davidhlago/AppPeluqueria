@@ -12,24 +12,29 @@ public class Grupo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 50)
-    private String nombre;
+    @Column(length = 100)
+    private String curso; // AÑADIDO
 
-    // Relación Many-to-Many, usando List en lugar de Set
+    @Column(length = 50)
+    private String turno; // AÑADIDO
+
     @ManyToMany(mappedBy = "grupos")
-    private List<com.peluqueria.entity.Usuario> usuarios = new ArrayList<>();
+    private List<Usuario> usuarios = new ArrayList<>();
 
     // --- Constructores ---
     public Grupo() {}
-    public Grupo(String nombre) { this.nombre = nombre; }
+    public Grupo(String curso, String turno) {
+        this.curso = curso;
+        this.turno = turno;
+    }
 
     // --- Getters y Setters ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-
-    public List<com.peluqueria.entity.Usuario> getUsuarios() { return usuarios; }
-    public void setUsuarios(List<com.peluqueria.entity.Usuario> usuarios) { this.usuarios = usuarios; }
+    public String getCurso() { return curso; }
+    public void setCurso(String curso) { this.curso = curso; }
+    public String getTurno() { return turno; }
+    public void setTurno(String turno) { this.turno = turno; }
+    public List<Usuario> getUsuarios() { return usuarios; }
+    public void setUsuarios(List<Usuario> usuarios) { this.usuarios = usuarios; }
 }

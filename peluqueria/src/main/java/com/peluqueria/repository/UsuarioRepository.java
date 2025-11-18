@@ -1,6 +1,6 @@
 package com.peluqueria.repository;
 
-import com.peluqueria.project.modelo.Usuario;
+import com.peluqueria.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
