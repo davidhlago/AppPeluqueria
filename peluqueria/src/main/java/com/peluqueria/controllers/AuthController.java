@@ -30,6 +30,7 @@ public class AuthController { // Clase AuthController
     @Autowired PasswordEncoder encoder;
     @Autowired JwtUtils jwtUtils;
 
+
     // --- 1. ENDPOINT DE INICIO DE SESIÓN ---
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LogInRequest loginRequest) {
