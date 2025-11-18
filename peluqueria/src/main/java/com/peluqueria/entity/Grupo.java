@@ -1,4 +1,4 @@
-package com.peluqueria.project.modelo;
+package com.peluqueria.entity;
 
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ public class Grupo {
 
     // Relación Many-to-Many, usando List en lugar de Set
     @ManyToMany(mappedBy = "grupos")
-    private List<com.peluqueria.project.modelo.Usuario> usuarios = new ArrayList<>();
+    private List<com.peluqueria.entity.Usuario> usuarios = new ArrayList<>();
 
     // --- Constructores ---
     public Grupo() {}
@@ -30,6 +30,6 @@ public class Grupo {
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 
-    public List<com.peluqueria.project.modelo.Usuario> getUsuarios() { return usuarios; }
-    public void setUsuarios(List<com.peluqueria.project.modelo.Usuario> usuarios) { this.usuarios = usuarios; }
+    public List<com.peluqueria.entity.Usuario> getUsuarios() { return usuarios; }
+    public void setUsuarios(List<com.peluqueria.entity.Usuario> usuarios) { this.usuarios = usuarios; }
 }

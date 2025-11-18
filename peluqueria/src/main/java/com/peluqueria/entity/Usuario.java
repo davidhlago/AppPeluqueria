@@ -1,4 +1,4 @@
-package com.peluqueria.project.modelo;
+package com.peluqueria.entity;
 
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class Usuario {
             joinColumns = @JoinColumn(name = "usuario_id"),
             inverseJoinColumns = @JoinColumn(name = "grupo_id")
     )
-    private List<com.peluqueria.project.modelo.Grupo> grupos = new ArrayList<>();
+    private List<com.peluqueria.entity.Grupo> grupos = new ArrayList<>();
 
     // --- Constructores ---
     public Usuario() {}
@@ -49,7 +49,7 @@ public class Usuario {
     public void setEmail(String email) { this.email = email; }
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
-    public List<com.peluqueria.project.modelo.Grupo> getGrupos() { return grupos; }
-    public void setGrupos(List<com.peluqueria.project.modelo.Grupo> grupos) { this.grupos = grupos; }
+    public List<com.peluqueria.entity.Grupo> getGrupos() { return grupos; }
+    public void setGrupos(List<com.peluqueria.entity.Grupo> grupos) { this.grupos = grupos; }
     //...
 }
