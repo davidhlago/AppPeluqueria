@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/grupos") // Endpoint en español para coherencia
+@RequestMapping("/api/grupos")
 public class GrupoController {
 
     private final ServicioGrupo servicioGrupo;
@@ -23,23 +23,22 @@ public class GrupoController {
         this.servicioGrupo = servicioGrupo;
     }
 
-    /** POST: Permite crear un nuevo grupo (curso y turno). Solo para ADMINISTRADORES. */
+    /** POST: Crear un nuevo grupo. Solo ADMINISTRADOR. */
     @PostMapping
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<Grupo> guardarGrupo(@Valid @RequestBody Grupo grupo) {
-        // Se espera un JSON con los campos de la entidad Grupo: {"curso": "...", "turno": "..."}
         Grupo grupoGuardado = servicioGrupo.guardarGrupo(grupo);
         return new ResponseEntity<>(grupoGuardado, HttpStatus.CREATED);
     }
 
-    /** GET: Obtener todos los grupos. Solo para usuarios autenticados. */
+    /** GET: Listar todos los grupos. */
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     public List<Grupo> obtenerTodosLosGrupos() {
         return servicioGrupo.obtenerTodosLosGrupos();
     }
 
-    /** GET: Obtener un grupo por ID. Solo para usuarios autenticados. */
+    /** GET: Obtener grupo por ID. */
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Grupo> obtenerGrupoPorId(@PathVariable Long id) {
@@ -51,7 +50,7 @@ public class GrupoController {
         }
     }
 
-    /** DELETE: Eliminar un grupo. Solo para ADMINISTRADORES. */
+    /** DELETE: Eliminar grupo. Solo ADMINISTRADOR. */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<Void> eliminarGrupo(@PathVariable Long id) {

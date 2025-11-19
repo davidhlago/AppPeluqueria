@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED) // Para herencia en JPA
 @Table(name = "usuario")
 public class Usuario {
 
@@ -16,7 +17,7 @@ public class Usuario {
     private String nombre;
 
     @Column(nullable = false, length = 150)
-    private String apellidos; // AÑADIDO
+    private String apellidos;
 
     @Column(nullable = false, unique = true, length = 150)
     private String email;
@@ -25,15 +26,7 @@ public class Usuario {
     private String password;
 
     @Column(length = 50)
-    private String rol; // Usado para roles de seguridad (ej: ADMIN, CLIENTE)
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "usuario_grupo",
-            joinColumns = @JoinColumn(name = "usuario_id"),
-            inverseJoinColumns = @JoinColumn(name = "grupo_id")
-    )
-    private List<Grupo> grupos = new ArrayList<>();
+    private String rol; // ADMIN, CLIENTE, GRUPO
 
     // --- Constructores ---
     public Usuario() {}
@@ -57,6 +50,4 @@ public class Usuario {
     public void setPassword(String password) { this.password = password; }
     public String getRol() { return rol; }
     public void setRol(String rol) { this.rol = rol; }
-    public List<Grupo> getGrupos() { return grupos; }
-    public void setGrupos(List<Grupo> grupos) { this.grupos = grupos; }
 }

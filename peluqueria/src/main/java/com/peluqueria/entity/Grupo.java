@@ -6,31 +6,40 @@ import java.util.List;
 
 @Entity
 @Table(name = "grupo")
-public class Grupo {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Grupo extends Usuario {
 
     @Column(length = 100)
-    private String curso; // AÑADIDO
+    private String curso;
 
     @Column(length = 50)
-    private String turno; // AÑADIDO
+    private String turno;
 
-    @ManyToMany(mappedBy = "grupos")
+    @ManyToMany
+    @JoinTable(
+            name = "usuario_grupo",
+            joinColumns = @JoinColumn(name = "grupo_id"),
+            inverseJoinColumns = @JoinColumn(name = "usuario_id")
+    )
     private List<Usuario> usuarios = new ArrayList<>();
 
-    // --- Constructores ---
+    // --- Constructor vacío (necesario para JPA) ---
     public Grupo() {}
+
+    // --- Constructor solo con atributos propios ---
     public Grupo(String curso, String turno) {
         this.curso = curso;
         this.turno = turno;
     }
 
+    // --- Constructor completo con atributos heredados + propios ---
+    public Grupo(String nombre, String apellidos, String email, String password,
+                 String curso, String turno) {
+        super(nombre, apellidos, email, password); // inicializa atributos de Usuario
+        this.curso = curso;
+        this.turno = turno;
+    }
+
     // --- Getters y Setters ---
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
     public String getCurso() { return curso; }
     public void setCurso(String curso) { this.curso = curso; }
     public String getTurno() { return turno; }
