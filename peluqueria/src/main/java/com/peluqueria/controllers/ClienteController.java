@@ -1,7 +1,7 @@
 package com.peluqueria.controllers;
 
 import com.peluqueria.entity.Cliente;
-import com.peluqueria.service.ServicioCliente;
+import com.peluqueria.security.service.ServicioCliente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

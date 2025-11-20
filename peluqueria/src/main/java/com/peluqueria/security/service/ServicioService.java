@@ -1,4 +1,4 @@
-package com.peluqueria.service;
+package com.peluqueria.security.service;
 
 import com.peluqueria.entity.Servicio;
 import com.peluqueria.entity.TiposServicio;

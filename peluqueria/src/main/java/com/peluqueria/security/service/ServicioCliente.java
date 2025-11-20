@@ -1,4 +1,4 @@
-package com.peluqueria.service;
+package com.peluqueria.security.service;
 
 import com.peluqueria.entity.Cliente;
 import com.peluqueria.repository.ClienteRepository;

@@ -1,7 +1,7 @@
 package com.peluqueria.controllers;
 
 import com.peluqueria.entity.Grupo;
-import com.peluqueria.service.ServicioGrupo;
+import com.peluqueria.security.service.ServicioGrupo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

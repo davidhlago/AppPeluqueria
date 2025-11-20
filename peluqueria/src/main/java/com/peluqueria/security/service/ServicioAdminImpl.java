@@ -1,4 +1,4 @@
-package com.peluqueria.service;
+package com.peluqueria.security.service;
 
 import com.peluqueria.entity.Admin;
 import com.peluqueria.repository.AdminRepository;
@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class ServicioAdmin {
+public class ServicioAdminImpl {
 
     private final AdminRepository adminRepository;
 
-    public ServicioAdmin(AdminRepository adminRepository) {
+    public ServicioAdminImpl(AdminRepository adminRepository) {
         this.adminRepository = adminRepository;
     }
 
@@ -27,6 +27,12 @@ public class ServicioAdmin {
     public Admin obtenerAdminPorId(Long id) {
         return adminRepository.findById(id)
                 .orElseThrow(NoSuchElementException::new);
+    }
+
+    public Admin actualizarAdmin(Long id, Admin detalles) {
+        Admin admin = obtenerAdminPorId(id);
+        admin.setEspecialidad(detalles.getEspecialidad());
+        return adminRepository.save(admin);
     }
 
     public void eliminarAdmin(Long id) {

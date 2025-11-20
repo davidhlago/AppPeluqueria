@@ -1,4 +1,4 @@
-package com.peluqueria.service;
+package com.peluqueria.security.service;
 
 import com.peluqueria.entity.Usuario;
 import com.peluqueria.repository.UsuarioRepository;
@@ -8,12 +8,16 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class ServicioUsuario {
+public class ServicioUsuarioImpl {
 
     private final UsuarioRepository usuarioRepository;
 
-    public ServicioUsuario(UsuarioRepository usuarioRepository) {
+    public ServicioUsuarioImpl(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
+    }
+
+    public Usuario guardarUsuario(Usuario usuario) {
+        return usuarioRepository.save(usuario);
     }
 
     public List<Usuario> obtenerTodosLosUsuarios() {
@@ -25,13 +29,13 @@ public class ServicioUsuario {
                 .orElseThrow(NoSuchElementException::new);
     }
 
-    public Usuario actualizarUsuario(Long id, Usuario detallesUsuario) {
+    public Usuario actualizarUsuario(Long id, Usuario detalles) {
         Usuario usuario = obtenerUsuarioPorId(id);
-        usuario.setNombre(detallesUsuario.getNombre());
-        usuario.setApellidos(detallesUsuario.getApellidos());
-        usuario.setEmail(detallesUsuario.getEmail());
-        usuario.setPassword(detallesUsuario.getPassword());
-        usuario.setRol(detallesUsuario.getRol());
+        usuario.setNombre(detalles.getNombre());
+        usuario.setApellidos(detalles.getApellidos());
+        usuario.setEmail(detalles.getEmail());
+        usuario.setPassword(detalles.getPassword());
+        usuario.setRol(detalles.getRol());
         return usuarioRepository.save(usuario);
     }
 

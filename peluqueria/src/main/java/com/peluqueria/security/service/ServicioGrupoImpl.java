@@ -1,4 +1,4 @@
-package com.peluqueria.service;
+package com.peluqueria.security.service;
 
 import com.peluqueria.entity.Grupo;
 import com.peluqueria.repository.GrupoRepository;
@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class ServicioGrupo {
+public class ServicioGrupoImpl {
 
     private final GrupoRepository grupoRepository;
 
-    public ServicioGrupo(GrupoRepository grupoRepository) {
+    public ServicioGrupoImpl(GrupoRepository grupoRepository) {
         this.grupoRepository = grupoRepository;
     }
 
@@ -27,6 +27,13 @@ public class ServicioGrupo {
     public Grupo obtenerGrupoPorId(Long id) {
         return grupoRepository.findById(id)
                 .orElseThrow(NoSuchElementException::new);
+    }
+
+    public Grupo actualizarGrupo(Long id, Grupo detalles) {
+        Grupo grupo = obtenerGrupoPorId(id);
+        grupo.setCurso(detalles.getCurso());
+        grupo.setTurno(detalles.getTurno());
+        return grupoRepository.save(grupo);
     }
 
     public void eliminarGrupo(Long id) {

@@ -26,7 +26,11 @@ public class Usuario {
     private String password;
 
     @Column(length = 50)
-    private String rol; // ADMIN, CLIENTE, GRUPO
+    private String rol;
+
+    @ManyToOne
+    @JoinColumn(name = "grupo_id")
+    private Grupo grupo;// ADMIN, CLIENTE, GRUPO
 
     // --- Constructores ---
     public Usuario() {}
