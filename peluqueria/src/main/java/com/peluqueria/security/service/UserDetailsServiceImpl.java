@@ -20,6 +20,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (usuario == null) {
             throw new UsernameNotFoundException("Usuario no encontrado con email: " + email);
         }
-        return UserDetailsImpl.build(usuario);
+        return com.peluqueria.security.services.UserDetailsImpl.build(usuario);
     }
 }

@@ -1,89 +1,85 @@
-/**package com.peluqueria.controllers;
+package com.peluqueria.controllers;
 
 import com.peluqueria.entity.Usuario;
 import com.peluqueria.payload.request.LogInRequest;
 import com.peluqueria.payload.request.SignUpRequest;
 import com.peluqueria.payload.response.JwtResponse;
 import com.peluqueria.payload.response.MessageResponse;
-import com.peluqueria.repository.UsuarioRepository; // Repositorio para buscar/guardar User
+import com.peluqueria.repository.UsuarioRepository;
 import com.peluqueria.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
-public class AuthController { // Clase AuthController
+@CrossOrigin(origins = "*", maxAge = 3600)
+public class AuthController {
 
-    @Autowired AuthenticationManager authenticationManager;
-    @Autowired UsuarioRepository userRepository;
-    @Autowired PasswordEncoder encoder;
-    @Autowired JwtUtils jwtUtils;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
-    // --- 1. ENDPOINT DE INICIO DE SESIÓN ---
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtils jwtUtils;
+
+    // --- LOGIN ---
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LogInRequest loginRequest) {
-
-        // 1. Autentica al usuario usando email y password
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
-        // 2. Guarda la autenticación en el contexto de seguridad
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 3. Genera el token JWT
-        String jwt = jwtUtils.generateJwtToken(authentication);
+        String jwt = jwtUtils.generarToken(authentication.getName());
 
-        // 4. Obtiene los detalles del usuario autenticado
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        com.peluqueria.security.services.UserDetailsImpl userDetails = (com.peluqueria.security.services.UserDetailsImpl) authentication.getPrincipal();
 
-        // 5. Extrae el rol del usuario para incluirlo en la respuesta
         List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
+                .map(auth -> auth.getAuthority())
                 .collect(Collectors.toList());
 
-        // 6. Retorna el JWT y los datos del usuario
-        return ResponseEntity.ok(new JwtResponse(jwt,
+        return ResponseEntity.ok(new JwtResponse(
+                jwt,
                 userDetails.getId(),
+                userDetails.getNombre(),
+                userDetails.getApellidos(),
                 userDetails.getEmail(),
-                roles.get(0))); // Retorna el rol principal
+                roles.isEmpty() ? null : roles.get(0)
+        ));
     }
 
-    // --- 2. ENDPOINT DE REGISTRO DE USUARIOS ---
+    // --- REGISTRO ---
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signupRequest) {
-
-        // 1. Validación: Verifica si el email ya está en uso
-        if (userRepository.findByEmail(signupRequest.getEmail()).isPresent()) {
+        if (usuarioRepository.findByEmail(signupRequest.getEmail()) != null) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: El Email ya está en uso!"));
         }
 
-        // 2. Crea la entidad User y codifica la contraseña
-        Usuario user = new Usuario(
+        Usuario usuario = new Usuario(
                 signupRequest.getNombre(),
-                signupRequest.getApellidos(), // AÑADIDO: Campo apellidos
+                signupRequest.getApellidos(),
                 signupRequest.getEmail(),
-                encoder.encode(signupRequest.getPassword())
+                passwordEncoder.encode(signupRequest.getPassword()),
+                signupRequest.getRol() == null ? "CLIENTE" : signupRequest.getRol()
         );
 
-        // 3. Asigna el rol (usa el rol proporcionado o 'CLIENTE' por defecto)
-        String rol = signupRequest.getRol() == null ? "CLIENTE" : signupRequest.getRol();
-        user.setRol(rol);
-
-        // 4. Guarda el usuario en la base de datos
-        userRepository.save(user);
+        usuarioRepository.save(usuario);
 
         return ResponseEntity.ok(new MessageResponse("Usuario registrado exitosamente!"));
     }
-}**/
+}

@@ -1,26 +1,22 @@
 package com.peluqueria.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
-@Table(name = "admin")
+@DiscriminatorValue("ADMIN") // valor que se guarda en la columna tipo_usuario
 public class Admin extends Usuario {
 
-    @Column(length = 100)
     private String especialidad;
 
-    // Constructor vacío (necesario para JPA)
+    // --- Constructores ---
     public Admin() {}
 
-    // Constructor completo con super
-    public Admin(String nombre, String apellidos, String email, String password, String especialidad) {
-        super(nombre, apellidos, email, password); // inicializa atributos heredados
-        this.especialidad = especialidad;          // inicializa atributo propio
+    public Admin(String nombre, String apellidos, String email, String password, String rol, String especialidad) {
+        super(nombre, apellidos, email, password, rol);
+        this.especialidad = especialidad;
     }
 
-    // Getters y Setters
+    // --- Getters y Setters ---
     public String getEspecialidad() { return especialidad; }
     public void setEspecialidad(String especialidad) { this.especialidad = especialidad; }
 }

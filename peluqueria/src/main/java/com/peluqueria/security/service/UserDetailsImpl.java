@@ -1,4 +1,4 @@
-package com.peluqueria.security.service;
+package com.peluqueria.security.services;
 
 import com.peluqueria.entity.Usuario;
 import org.springframework.security.core.GrantedAuthority;
@@ -60,9 +60,10 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public boolean isEnabled() { return true; }
 
-    // Getters adicionales
+    // --- Getters adicionales ---
     public Long getId() { return id; }
     public String getNombre() { return nombre; }
     public String getApellidos() { return apellidos; }
+    public String getEmail() { return email; }   // ✅ este faltaba
     public String getRol() { return rol; }
 }
