@@ -3,9 +3,10 @@ package com.peluqueria.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+// CAMBIO CLAVE: Usamos JOINED para tablas separadas
+@Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "tipo_usuario", discriminatorType = DiscriminatorType.STRING)
-@Table(name = "usuarios")  // la tabla se define solo en el padre
+@Table(name = "usuarios")
 public class Usuario {
 
     @Id

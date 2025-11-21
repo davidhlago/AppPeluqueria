@@ -5,6 +5,7 @@ import jakarta.persistence.DiscriminatorValue;
 
 @Entity
 @DiscriminatorValue("GRUPO")  // valor que se guarda en la columna tipo_usuario
+// NOTA: Se creará una tabla 'grupo' (o similar)
 public class Grupo extends Usuario {
 
     private String curso;

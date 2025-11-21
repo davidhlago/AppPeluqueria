@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @DiscriminatorValue("ADMIN") // valor que se guarda en la columna tipo_usuario
+// NOTA: Con JOINED, se creará una tabla 'admin' (o similar, depende de la convención de Spring)
 public class Admin extends Usuario {
 
     private String especialidad;

@@ -6,6 +6,7 @@ import jakarta.persistence.DiscriminatorValue;
 
 @Entity
 @DiscriminatorValue("CLIENTE")  // valor que se guarda en la columna tipo_usuario
+// NOTA: Se creará una tabla 'cliente' (o similar)
 public class Cliente extends Usuario {
 
     @Column(length = 20)
