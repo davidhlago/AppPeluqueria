@@ -1,7 +1,7 @@
 package com.peluqueria.security.service;
 
 import com.peluqueria.entity.Servicio;
-import com.peluqueria.entity.TiposServicio;
+import com.peluqueria.entity.TipoServicio; // Importación necesaria
 import com.peluqueria.repository.ServicioRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -26,10 +26,13 @@ public class ServicioService {
 
     public Servicio save(Servicio servicio) {
 
+        // Validación de la duración
         if (servicio.getDuracionBloques() <= 0) {
             System.err.println("ERROR: La duración del servicio debe ser mayor a cero.");
             return null; // Devolver null para indicar que la validación falló
         }
+
+        // Guardar en el repositorio
         return servicioRepository.save(servicio);
     }
 
@@ -40,16 +43,15 @@ public class ServicioService {
     // Consultas personalizadas
 
     public List<Servicio> buscarPorNombre(String nombre) {
-
         return servicioRepository.findByNombreContainingIgnoreCase(nombre);
     }
 
-
-    public List<Servicio> buscarPorTipoServicio(TiposServicio tipoServicio) {
-        return servicioRepository.findByTipoServicio(tipoServicio);}
+    // CAMBIO: Usa la nueva entidad TipoServicio
+    public List<Servicio> buscarPorTipoServicio(TipoServicio tipoServicio) {
+        return servicioRepository.findByTipoServicio(tipoServicio);
+    }
 
     public List<Servicio> buscarPorDuracionMinimaNativa(int minDuracion) {
-
         return servicioRepository.buscarPorDuracionMinima(minDuracion);
     }
 

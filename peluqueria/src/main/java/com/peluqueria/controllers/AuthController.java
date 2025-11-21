@@ -1,8 +1,10 @@
 package com.peluqueria.controllers;
 
+import com.peluqueria.entity.Admin;
+import com.peluqueria.entity.Cliente;
+import com.peluqueria.entity.Grupo;
 import com.peluqueria.entity.Usuario;
 import com.peluqueria.payload.request.LogInRequest;
-import com.peluqueria.payload.request.SignUpRequest;
 import com.peluqueria.payload.response.JwtResponse;
 import com.peluqueria.payload.response.MessageResponse;
 import com.peluqueria.repository.UsuarioRepository;
@@ -15,10 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
 import jakarta.validation.Valid;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -37,49 +36,70 @@ public class AuthController {
     @Autowired
     private JwtUtils jwtUtils;
 
-    // --- LOGIN ---
+    // LOGIN
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LogInRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
+                )
+        );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
         String jwt = jwtUtils.generarToken(authentication.getName());
 
-        com.peluqueria.security.services.UserDetailsImpl userDetails = (com.peluqueria.security.services.UserDetailsImpl) authentication.getPrincipal();
+        com.peluqueria.security.services.UserDetailsImpl userDetails =
+                (com.peluqueria.security.services.UserDetailsImpl) authentication.getPrincipal();
 
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(auth -> auth.getAuthority())
-                .collect(Collectors.toList());
+        String rol = userDetails.getAuthorities().stream()
+                .findFirst()
+                .map(a -> a.getAuthority())
+                .orElse(null);
 
         return ResponseEntity.ok(new JwtResponse(
                 jwt,
                 userDetails.getId(),
                 userDetails.getNombre(),
                 userDetails.getApellidos(),
-                userDetails.getEmail(),
-                roles.isEmpty() ? null : roles.get(0)
+                userDetails.getUsername(),
+                rol
         ));
     }
 
-    // --- REGISTRO ---
-    @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signupRequest) {
-        if (usuarioRepository.findByEmail(signupRequest.getEmail()) != null) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: El Email ya está en uso!"));
+    // SIGNUP ADMIN
+    @PostMapping("/signup/admin")
+    public ResponseEntity<?> crearAdmin(@Valid @RequestBody Admin admin) {
+        if (usuarioRepository.findByUsername(admin.getUsername()) != null) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username en uso!"));
         }
+        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+        admin.setRol("ADMIN");
+        usuarioRepository.save(admin);
+        return ResponseEntity.ok(new MessageResponse("Admin creado correctamente."));
+    }
 
-        Usuario usuario = new Usuario(
-                signupRequest.getNombre(),
-                signupRequest.getApellidos(),
-                signupRequest.getEmail(),
-                passwordEncoder.encode(signupRequest.getPassword()),
-                signupRequest.getRol() == null ? "CLIENTE" : signupRequest.getRol()
-        );
+    // SIGNUP CLIENTE
+    @PostMapping("/signup/cliente")
+    public ResponseEntity<?> crearCliente(@Valid @RequestBody Cliente cliente) {
+        if (usuarioRepository.findByUsername(cliente.getUsername()) != null) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username en uso!"));
+        }
+        cliente.setPassword(passwordEncoder.encode(cliente.getPassword()));
+        cliente.setRol("CLIENTE");
+        usuarioRepository.save(cliente);
+        return ResponseEntity.ok(new MessageResponse("Cliente creado correctamente."));
+    }
 
-        usuarioRepository.save(usuario);
-
-        return ResponseEntity.ok(new MessageResponse("Usuario registrado exitosamente!"));
+    // SIGNUP GRUPO
+    @PostMapping("/signup/grupo")
+    public ResponseEntity<?> crearGrupo(@Valid @RequestBody Grupo grupo) {
+        if (usuarioRepository.findByUsername(grupo.getUsername()) != null) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username en uso!"));
+        }
+        grupo.setPassword(passwordEncoder.encode(grupo.getPassword()));
+        grupo.setRol("GRUPO");
+        usuarioRepository.save(grupo);
+        return ResponseEntity.ok(new MessageResponse("Grupo creado correctamente."));
     }
 }

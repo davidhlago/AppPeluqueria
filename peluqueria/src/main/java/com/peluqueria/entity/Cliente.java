@@ -5,8 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.DiscriminatorValue;
 
 @Entity
-@DiscriminatorValue("CLIENTE")  // valor que se guarda en la columna tipo_usuario
-// NOTA: Se creará una tabla 'cliente' (o similar)
+@DiscriminatorValue("CLIENTE")
 public class Cliente extends Usuario {
 
     @Column(length = 20)
@@ -23,9 +22,9 @@ public class Cliente extends Usuario {
 
     public Cliente() {}
 
-    public Cliente(String nombre, String apellidos, String email, String password,
+    public Cliente(String nombre, String apellidos, String username, String email, String password,
                    String telefono, String observacion, String alergenos, String direccion) {
-        super(nombre, apellidos, email, password);
+        super(nombre, apellidos, username, email, password);
         this.telefono = telefono;
         this.observacion = observacion;
         this.alergenos = alergenos;

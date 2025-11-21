@@ -3,7 +3,6 @@ package com.peluqueria.entity;
 import jakarta.persistence.*;
 
 @Entity
-// CAMBIO CLAVE: Usamos JOINED para tablas separadas
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "tipo_usuario", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "usuarios")
@@ -17,6 +16,9 @@ public class Usuario {
     private String apellidos;
 
     @Column(unique = true)
+    private String username; // Nuevo campo
+
+    @Column(unique = true)
     private String email;
 
     private String password;
@@ -24,15 +26,16 @@ public class Usuario {
 
     public Usuario() {}
 
-    public Usuario(String nombre, String apellidos, String email, String password) {
+    public Usuario(String nombre, String apellidos, String username, String email, String password) {
         this.nombre = nombre;
         this.apellidos = apellidos;
+        this.username = username;
         this.email = email;
         this.password = password;
     }
 
-    public Usuario(String nombre, String apellidos, String email, String password, String rol) {
-        this(nombre, apellidos, email, password);
+    public Usuario(String nombre, String apellidos, String username, String email, String password, String rol) {
+        this(nombre, apellidos, username, email, password);
         this.rol = rol;
     }
 
@@ -45,6 +48,9 @@ public class Usuario {
 
     public String getApellidos() { return apellidos; }
     public void setApellidos(String apellidos) { this.apellidos = apellidos; }
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }

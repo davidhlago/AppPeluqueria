@@ -29,40 +29,39 @@ public class SecurityConfig {
         this.authTokenFilter = authTokenFilter;
     }
 
-    // ✅ Bean AuthenticationManager para que AuthController lo pueda inyectar
+    // AuthenticationManager para inyectar en AuthController
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
-    // ✅ PasswordEncoder para encriptar contraseñas
+    // PasswordEncoder para encriptar contraseñas
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ Provider que usa nuestro UserDetailsService
+    // Provider que usa nuestro UserDetailsService
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setUserDetailsService(userDetailsService); // busca por username
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
 
-    // ✅ Configuración de seguridad HTTP
+    // Configuración de seguridad HTTP
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // login y registro públicos
-                        .anyRequest().authenticated() // el resto requiere JWT
-                );
-
-        http.authenticationProvider(authenticationProvider());
-        http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
+                        .requestMatchers("/api/auth/**").permitAll()  // login y signup públicos
+                        .anyRequest().authenticated()                  // el resto requiere JWT
+                )
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

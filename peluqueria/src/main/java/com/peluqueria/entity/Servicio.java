@@ -4,16 +4,16 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "servicio")
-
 public class Servicio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idServicio;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_servicio", nullable = false)
-    private TiposServicio tipoServicio;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tipo_servicio_id", nullable = false)
+    private TipoServicio tipoServicio;
 
     @Column(nullable = false)
     private String nombre;
@@ -27,12 +27,25 @@ public class Servicio {
     @Column(nullable = false)
     private double precio;
 
-    public TiposServicio getTipoServicio() {
+    public Servicio(Long idServicio, TipoServicio tipoServicio, String nombre, String descripcion, int duracionBloques, double precio) {
+        this.idServicio = idServicio;
+        this.tipoServicio = tipoServicio;
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.duracionBloques = duracionBloques;
+        this.precio = precio;
+    }
+
+    public TipoServicio getTipoServicio() {
         return tipoServicio;
     }
 
-    public void setTipoServicio(TiposServicio tipoServicio) {
+    public void setTipoServicio(TipoServicio tipoServicio) {
         this.tipoServicio = tipoServicio;
+    }
+
+    public int getDuracionBloques() {
+        return duracionBloques;
     }
 
     public Long getIdServicio() {
@@ -51,6 +64,10 @@ public class Servicio {
         this.nombre = nombre;
     }
 
+    public void setDuracionBloques(int duracionBloques) {
+        this.duracionBloques = duracionBloques;
+    }
+
     public String getDescripcion() {
         return descripcion;
     }
@@ -59,19 +76,23 @@ public class Servicio {
         this.descripcion = descripcion;
     }
 
-    public int getDuracionBloques() {
-        return duracionBloques;
-    }
-
-    public void setDuracionBloques(int duracionBloques) {
-        this.duracionBloques = duracionBloques;
-    }
-
     public double getPrecio() {
         return precio;
     }
 
     public void setPrecio(double precio) {
         this.precio = precio;
+    }
+
+    @Override
+    public String toString() {
+        return "Servicio{" +
+                "idServicio=" + idServicio +
+                ", tipoServicio=" + tipoServicio +
+                ", nombre='" + nombre + '\'' +
+                ", descripcion='" + descripcion + '\'' +
+                ", duracionBloques=" + duracionBloques +
+                ", precio=" + precio +
+                '}';
     }
 }

@@ -15,10 +15,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private UsuarioRepository usuarioRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findByEmail(email);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Usuario usuario = usuarioRepository.findByUsername(username);
         if (usuario == null) {
-            throw new UsernameNotFoundException("Usuario no encontrado con email: " + email);
+            throw new UsernameNotFoundException("Usuario no encontrado con username: " + username);
         }
         return com.peluqueria.security.services.UserDetailsImpl.build(usuario);
     }
