@@ -3,7 +3,6 @@ package com.peluqueria.controllers;
 import com.peluqueria.entity.Admin;
 import com.peluqueria.entity.Cliente;
 import com.peluqueria.entity.Grupo;
-import com.peluqueria.entity.Usuario;
 import com.peluqueria.payload.request.LogInRequest;
 import com.peluqueria.payload.response.JwtResponse;
 import com.peluqueria.payload.response.MessageResponse;
@@ -36,7 +35,7 @@ public class AuthController {
     @Autowired
     private JwtUtils jwtUtils;
 
-    // LOGIN
+    // ✅ LOGIN
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LogInRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -47,7 +46,6 @@ public class AuthController {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generarToken(authentication.getName());
 
         com.peluqueria.security.services.UserDetailsImpl userDetails =
                 (com.peluqueria.security.services.UserDetailsImpl) authentication.getPrincipal();
@@ -56,6 +54,9 @@ public class AuthController {
                 .findFirst()
                 .map(a -> a.getAuthority())
                 .orElse(null);
+
+        // ✅ Generamos token con username y rol
+        String jwt = jwtUtils.generarToken(userDetails.getUsername(), rol);
 
         return ResponseEntity.ok(new JwtResponse(
                 jwt,

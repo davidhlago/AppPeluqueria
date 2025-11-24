@@ -1,6 +1,8 @@
 package com.peluqueria.security.jwt;
 
 import java.io.IOException;
+import java.util.List;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -35,29 +38,30 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        // Obtener la ruta de la solicitud
         String path = request.getRequestURI();
 
-        // 🚩 LÓGICA CLAVE AÑADIDA: Ignorar /api/auth/**
-        // Si la ruta comienza con /api/auth/, salimos sin procesar el JWT,
-        // permitiendo que el SecurityConfig aplique el .permitAll().
+        // Ignorar rutas públicas de autenticación
         if (path.startsWith("/api/auth/")) {
             filterChain.doFilter(request, response);
-            return; // Salir del método, no procesar el JWT
+            return;
         }
 
-        // --- Lógica Estándar de Verificación de JWT para Rutas Protegidas ---
         try {
             String jwt = parseJwt(request);
 
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-                // Asume que el token contiene el 'email' (nombre de usuario)
-                String email = jwtUtils.getUserNameFromJwtToken(jwt);
+                // ✅ Extraemos username y rol del token
+                String username = jwtUtils.getUserNameFromJwtToken(jwt);
+                String rol = jwtUtils.getRolFromJwtToken(jwt);
 
-                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                // Cargamos el usuario desde BD
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
+                // ✅ Reconstruimos la autoridad desde el claim del token
+                GrantedAuthority authority = new org.springframework.security.core.authority.SimpleGrantedAuthority(rol);
+
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, List.of(authority));
 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

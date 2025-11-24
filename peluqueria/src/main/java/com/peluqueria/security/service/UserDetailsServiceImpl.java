@@ -2,6 +2,7 @@ package com.peluqueria.security.service;
 
 import com.peluqueria.entity.Usuario;
 import com.peluqueria.repository.UsuarioRepository;
+import com.peluqueria.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,6 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (usuario == null) {
             throw new UsernameNotFoundException("Usuario no encontrado con username: " + username);
         }
-        return com.peluqueria.security.services.UserDetailsImpl.build(usuario);
+        // ✅ Construimos el UserDetailsImpl con los datos del usuario
+        return UserDetailsImpl.build(usuario);
     }
 }

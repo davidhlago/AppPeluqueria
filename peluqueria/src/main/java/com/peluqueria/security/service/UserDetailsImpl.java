@@ -35,7 +35,7 @@ public class UserDetailsImpl implements UserDetails {
                 usuario.getNombre(),
                 usuario.getApellidos(),
                 usuario.getEmail(),
-                usuario.getUsername(), // ahora usamos el campo username
+                usuario.getUsername(),
                 usuario.getPassword(),
                 usuario.getRol()
         );
@@ -43,6 +43,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // ✅ Devuelve la autoridad directamente desde el rol guardado en BD
         return Collections.singletonList(new SimpleGrantedAuthority(rol));
     }
 
@@ -53,7 +54,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username; // 🔹 devolvemos el username
+        return username; // usamos el campo username como identificador
     }
 
     @Override
@@ -96,5 +97,4 @@ public class UserDetailsImpl implements UserDetails {
     public String getRol() {
         return rol;
     }
-
 }
