@@ -13,6 +13,27 @@ public class PeluqueriaApplication {
 }
 
 
+/*
+*  post http://localhost:8080/api/auth/signup/admin
+* {
+    "nombre": "Carlos",
+    "apellidos": "Sanz",
+    "username": "admin_jefe",
+    "email": "otro_email_inventado@peluqueria.com",
+    "password": "password123",
+    "especialidad": "Gerencia"
+}
+*
+*
+* post http://localhost:8080/api/auth/signin
+* {
+    "username": "admin_jefe",
+    "password": "password123"
+}
+* get http://localhost:8080/api/test/admin
+*
+* */
+
 //http://localhost:8080/swagger-ui/index.html#/
 
 

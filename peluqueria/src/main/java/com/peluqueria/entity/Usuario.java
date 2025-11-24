@@ -16,7 +16,7 @@ public class Usuario {
     private String apellidos;
 
     @Column(unique = true)
-    private String username; // Nuevo campo
+    private String username;
 
     @Column(unique = true)
     private String email;
@@ -39,7 +39,7 @@ public class Usuario {
         this.rol = rol;
     }
 
-    // Getters y Setters
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

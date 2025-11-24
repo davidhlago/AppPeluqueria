@@ -7,6 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AdminRepository extends JpaRepository<Admin, Long> {
 
-    // Ejemplo: buscar por especialidad
     java.util.List<Admin> findByEspecialidad(String especialidad);
 }

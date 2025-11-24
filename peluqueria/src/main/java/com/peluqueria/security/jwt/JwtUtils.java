@@ -21,11 +21,10 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    // ✅ Genera token con username y rol
     public String generarToken(String username, String rol) {
         return Jwts.builder()
                 .setSubject(username)
-                .claim("rol", rol) // añadimos el rol como claim
+                .claim("rol", rol)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -41,7 +40,6 @@ public class JwtUtils {
                 .getSubject();
     }
 
-    // ✅ Nuevo método para extraer el rol
     public String getRolFromJwtToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())

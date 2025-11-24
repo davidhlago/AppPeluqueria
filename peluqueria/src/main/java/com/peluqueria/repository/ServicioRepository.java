@@ -12,7 +12,7 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
 
     List<Servicio> findByNombreContainingIgnoreCase(String nombre);
 
-    // CAMBIO CLAVE: El parámetro ahora es la Entidad TipoServicio
+
     List<Servicio> findByTipoServicio(TipoServicio tipoServicio);
 
     @Query(

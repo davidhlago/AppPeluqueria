@@ -1,4 +1,4 @@
-package com.peluqueria.security.services;
+package com.peluqueria.security.service;
 
 import com.peluqueria.entity.Usuario;
 import org.springframework.security.core.GrantedAuthority;
@@ -43,7 +43,6 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // ✅ Devuelve la autoridad directamente desde el rol guardado en BD
         return Collections.singletonList(new SimpleGrantedAuthority(rol));
     }
 
@@ -54,7 +53,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username; // usamos el campo username como identificador
+        return username;
     }
 
     @Override
@@ -77,7 +76,7 @@ public class UserDetailsImpl implements UserDetails {
         return true;
     }
 
-    // --- Getters adicionales ---
+
     public Long getId() {
         return id;
     }

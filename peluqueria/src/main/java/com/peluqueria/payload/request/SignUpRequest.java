@@ -12,7 +12,7 @@ public class SignUpRequest {
 
     @NotBlank
     @Size(min = 3, max = 150)
-    private String apellidos; // Campo adicional solicitado
+    private String apellidos;
 
     @NotBlank
     @Size(max = 150)

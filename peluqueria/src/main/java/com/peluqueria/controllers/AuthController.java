@@ -35,7 +35,6 @@ public class AuthController {
     @Autowired
     private JwtUtils jwtUtils;
 
-    // ✅ LOGIN
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LogInRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -47,15 +46,14 @@ public class AuthController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        com.peluqueria.security.services.UserDetailsImpl userDetails =
-                (com.peluqueria.security.services.UserDetailsImpl) authentication.getPrincipal();
+        com.peluqueria.security.service.UserDetailsImpl userDetails =
+                (com.peluqueria.security.service.UserDetailsImpl) authentication.getPrincipal();
 
         String rol = userDetails.getAuthorities().stream()
                 .findFirst()
                 .map(a -> a.getAuthority())
                 .orElse(null);
 
-        // ✅ Generamos token con username y rol
         String jwt = jwtUtils.generarToken(userDetails.getUsername(), rol);
 
         return ResponseEntity.ok(new JwtResponse(
@@ -68,7 +66,6 @@ public class AuthController {
         ));
     }
 
-    // SIGNUP ADMIN
     @PostMapping("/signup/admin")
     public ResponseEntity<?> crearAdmin(@Valid @RequestBody Admin admin) {
         if (usuarioRepository.findByUsername(admin.getUsername()) != null) {
@@ -80,7 +77,6 @@ public class AuthController {
         return ResponseEntity.ok(new MessageResponse("Admin creado correctamente."));
     }
 
-    // SIGNUP CLIENTE
     @PostMapping("/signup/cliente")
     public ResponseEntity<?> crearCliente(@Valid @RequestBody Cliente cliente) {
         if (usuarioRepository.findByUsername(cliente.getUsername()) != null) {
@@ -92,7 +88,6 @@ public class AuthController {
         return ResponseEntity.ok(new MessageResponse("Cliente creado correctamente."));
     }
 
-    // SIGNUP GRUPO
     @PostMapping("/signup/grupo")
     public ResponseEntity<?> crearGrupo(@Valid @RequestBody Grupo grupo) {
         if (usuarioRepository.findByUsername(grupo.getUsername()) != null) {

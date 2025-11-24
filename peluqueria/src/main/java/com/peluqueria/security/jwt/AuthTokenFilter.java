@@ -40,7 +40,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // Ignorar rutas públicas de autenticación
         if (path.startsWith("/api/auth/")) {
             filterChain.doFilter(request, response);
             return;
@@ -50,14 +49,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             String jwt = parseJwt(request);
 
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-                // ✅ Extraemos username y rol del token
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
                 String rol = jwtUtils.getRolFromJwtToken(jwt);
 
-                // Cargamos el usuario desde BD
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                // ✅ Reconstruimos la autoridad desde el claim del token
                 GrantedAuthority authority = new org.springframework.security.core.authority.SimpleGrantedAuthority(rol);
 
                 UsernamePasswordAuthenticationToken authentication =

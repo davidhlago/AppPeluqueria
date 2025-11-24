@@ -26,13 +26,11 @@ public class ServicioService {
 
     public Servicio save(Servicio servicio) {
 
-        // Validación de la duración
         if (servicio.getDuracionBloques() <= 0) {
             System.err.println("ERROR: La duración del servicio debe ser mayor a cero.");
-            return null; // Devolver null para indicar que la validación falló
+            return null;
         }
 
-        // Guardar en el repositorio
         return servicioRepository.save(servicio);
     }
 
@@ -40,13 +38,11 @@ public class ServicioService {
         servicioRepository.deleteById(id);
     }
 
-    // Consultas personalizadas
 
     public List<Servicio> buscarPorNombre(String nombre) {
         return servicioRepository.findByNombreContainingIgnoreCase(nombre);
     }
 
-    // CAMBIO: Usa la nueva entidad TipoServicio
     public List<Servicio> buscarPorTipoServicio(TipoServicio tipoServicio) {
         return servicioRepository.findByTipoServicio(tipoServicio);
     }
