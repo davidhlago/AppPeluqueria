@@ -35,6 +35,7 @@ public class AuthController {
     @Autowired
     private JwtUtils jwtUtils;
 
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LogInRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -77,6 +78,7 @@ public class AuthController {
         return ResponseEntity.ok(new MessageResponse("Admin creado correctamente."));
     }
 
+
     @PostMapping("/signup/cliente")
     public ResponseEntity<?> crearCliente(@Valid @RequestBody Cliente cliente) {
         if (usuarioRepository.findByUsername(cliente.getUsername()) != null) {
@@ -87,6 +89,7 @@ public class AuthController {
         usuarioRepository.save(cliente);
         return ResponseEntity.ok(new MessageResponse("Cliente creado correctamente."));
     }
+
 
     @PostMapping("/signup/grupo")
     public ResponseEntity<?> crearGrupo(@Valid @RequestBody Grupo grupo) {

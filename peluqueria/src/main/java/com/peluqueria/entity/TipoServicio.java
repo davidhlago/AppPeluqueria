@@ -2,7 +2,7 @@ package com.peluqueria.entity;
 
 import jakarta.persistence.*;
 
-@Entity // <-- Es ahora una entidad JPA
+@Entity
 @Table(name = "tipo_servicio")
 public class TipoServicio {
 
