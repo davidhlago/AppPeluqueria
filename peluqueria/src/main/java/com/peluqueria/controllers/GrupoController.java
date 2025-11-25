@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -23,24 +22,14 @@ public class GrupoController {
         this.servicioGrupo = servicioGrupo;
     }
 
-    /** POST: Crear un nuevo grupo. Solo ADMINISTRADOR. */
-    @PostMapping
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<Grupo> guardarGrupo(@Valid @RequestBody Grupo grupo) {
-        Grupo grupoGuardado = servicioGrupo.guardarGrupo(grupo);
-        return new ResponseEntity<>(grupoGuardado, HttpStatus.CREATED);
-    }
-
-    /** GET: Listar todos los grupos. */
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
     public List<Grupo> obtenerTodosLosGrupos() {
         return servicioGrupo.obtenerTodosLosGrupos();
     }
 
-    /** GET: Obtener grupo por ID. */
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<Grupo> obtenerGrupoPorId(@PathVariable Long id) {
         try {
             Grupo grupo = servicioGrupo.obtenerGrupoPorId(id);
@@ -50,9 +39,25 @@ public class GrupoController {
         }
     }
 
-    /** DELETE: Eliminar grupo. Solo ADMINISTRADOR. */
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Grupo> actualizarGrupo(@PathVariable Long id, @RequestBody Grupo detallesGrupo) {
+        try {
+            Grupo grupoExistente = servicioGrupo.obtenerGrupoPorId(id);
+            grupoExistente.setNombre(detallesGrupo.getNombre());
+            grupoExistente.setApellidos(detallesGrupo.getApellidos());
+            grupoExistente.setEmail(detallesGrupo.getEmail());
+            grupoExistente.setCurso(detallesGrupo.getCurso());
+            grupoExistente.setTurno(detallesGrupo.getTurno());
+            Grupo grupoActualizado = servicioGrupo.guardarGrupo(grupoExistente);
+            return ResponseEntity.ok(grupoActualizado);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> eliminarGrupo(@PathVariable Long id) {
         try {
             servicioGrupo.eliminarGrupo(id);
@@ -60,5 +65,12 @@ public class GrupoController {
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/buscar")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<Grupo>> buscarGrupos(@RequestParam String texto) {
+        List<Grupo> grupos = servicioGrupo.buscarPorCurso(texto);
+        return grupos.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(grupos);
     }
 }

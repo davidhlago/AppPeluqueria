@@ -23,16 +23,14 @@ public class UsuarioController {
         this.servicioUsuario = servicioUsuario;
     }
 
-    /** GET: Listar todos los usuarios. Solo ADMINISTRADOR. */
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public List<Usuario> obtenerTodosLosUsuarios() {
         return servicioUsuario.obtenerTodosLosUsuarios();
     }
 
-    /** GET: Obtener usuario por ID. ADMIN o el propio usuario. */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR') or #id == authentication.principal.id")
+    @PreAuthorize("hasAuthority('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable Long id) {
         try {
             Usuario usuario = servicioUsuario.obtenerUsuarioPorId(id);
@@ -42,9 +40,8 @@ public class UsuarioController {
         }
     }
 
-    /** PUT: Actualizar usuario. ADMIN o el propio usuario. */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR') or #id == authentication.principal.id")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @Valid @RequestBody Usuario detallesUsuario) {
         try {
             Usuario usuarioActualizado = servicioUsuario.actualizarUsuario(id, detallesUsuario);
@@ -54,9 +51,8 @@ public class UsuarioController {
         }
     }
 
-    /** DELETE: Eliminar usuario. Solo ADMINISTRADOR. */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         try {
             servicioUsuario.eliminarUsuario(id);
@@ -64,5 +60,12 @@ public class UsuarioController {
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/buscar/email")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<Usuario>> buscarPorEmail(@RequestParam String texto) {
+        List<Usuario> usuarios = servicioUsuario.buscarPorEmail(texto);
+        return usuarios.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(usuarios);
     }
 }

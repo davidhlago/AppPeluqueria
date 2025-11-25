@@ -2,47 +2,43 @@ package com.peluqueria.security.service;
 
 import com.peluqueria.entity.Usuario;
 import com.peluqueria.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
-public class ServicioUsuarioImpl {
+public class ServicioUsuarioImpl implements ServicioUsuario {
 
-    private final UsuarioRepository usuarioRepository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
-    public ServicioUsuarioImpl(UsuarioRepository usuarioRepository) {
-        this.usuarioRepository = usuarioRepository;
-    }
-
-    public Usuario guardarUsuario(Usuario usuario) {
-        return usuarioRepository.save(usuario);
-    }
-
+    @Override
     public List<Usuario> obtenerTodosLosUsuarios() {
         return usuarioRepository.findAll();
     }
 
+    @Override
     public Usuario obtenerUsuarioPorId(Long id) {
-        return usuarioRepository.findById(id)
-                .orElseThrow(NoSuchElementException::new);
+        return usuarioRepository.findById(id).orElseThrow();
     }
 
-    public Usuario actualizarUsuario(Long id, Usuario detalles) {
+    @Override
+    public Usuario actualizarUsuario(Long id, Usuario detallesUsuario) {
         Usuario usuario = obtenerUsuarioPorId(id);
-        usuario.setNombre(detalles.getNombre());
-        usuario.setApellidos(detalles.getApellidos());
-        usuario.setEmail(detalles.getEmail());
-        usuario.setPassword(detalles.getPassword());
-        usuario.setRol(detalles.getRol());
+        usuario.setNombre(detallesUsuario.getNombre());
+        usuario.setApellidos(detallesUsuario.getApellidos());
+        usuario.setEmail(detallesUsuario.getEmail());
+        usuario.setUsername(detallesUsuario.getUsername());
         return usuarioRepository.save(usuario);
     }
 
+    @Override
     public void eliminarUsuario(Long id) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new NoSuchElementException();
-        }
         usuarioRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Usuario> buscarPorEmail(String texto) {
+        return usuarioRepository.buscarPorEmailParcial(texto);
     }
 }

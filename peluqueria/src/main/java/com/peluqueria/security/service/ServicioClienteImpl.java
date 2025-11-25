@@ -2,46 +2,51 @@ package com.peluqueria.security.service;
 
 import com.peluqueria.entity.Cliente;
 import com.peluqueria.repository.ClienteRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
-public class ServicioClienteImpl {
+public class ServicioClienteImpl implements ServicioCliente {
 
-    private final ClienteRepository clienteRepository;
+    @Autowired
+    private ClienteRepository clienteRepository;
 
-    public ServicioClienteImpl(ClienteRepository clienteRepository) {
-        this.clienteRepository = clienteRepository;
-    }
-
+    @Override
     public Cliente guardarCliente(Cliente cliente) {
         return clienteRepository.save(cliente);
     }
 
+    @Override
     public List<Cliente> obtenerTodosLosClientes() {
         return clienteRepository.findAll();
     }
 
+    @Override
     public Cliente obtenerClientePorId(Long id) {
-        return clienteRepository.findById(id)
-                .orElseThrow(NoSuchElementException::new);
+        return clienteRepository.findById(id).orElseThrow();
     }
 
-    public Cliente actualizarCliente(Long id, Cliente detalles) {
+    @Override
+    public Cliente actualizarCliente(Long id, Cliente detallesCliente) {
         Cliente cliente = obtenerClientePorId(id);
-        cliente.setTelefono(detalles.getTelefono());
-        cliente.setObservacion(detalles.getObservacion());
-        cliente.setAlergenos(detalles.getAlergenos());
-        cliente.setDireccion(detalles.getDireccion());
+        cliente.setNombre(detallesCliente.getNombre());
+        cliente.setApellidos(detallesCliente.getApellidos());
+        cliente.setEmail(detallesCliente.getEmail());
+        cliente.setTelefono(detallesCliente.getTelefono());
+        cliente.setObservacion(detallesCliente.getObservacion());
+        cliente.setAlergenos(detallesCliente.getAlergenos());
+        cliente.setDireccion(detallesCliente.getDireccion());
         return clienteRepository.save(cliente);
     }
 
+    @Override
     public void eliminarCliente(Long id) {
-        if (!clienteRepository.existsById(id)) {
-            throw new NoSuchElementException();
-        }
         clienteRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Cliente> buscarObservacionesOAlergenos(String texto) {
+        return clienteRepository.buscarEnObservacionesOAlergenos(texto);
     }
 }

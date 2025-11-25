@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -23,24 +22,14 @@ public class AdminController {
         this.servicioAdmin = servicioAdmin;
     }
 
-    /** POST: Crear un nuevo admin. Solo ADMINISTRADOR. */
-    @PostMapping
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    public ResponseEntity<Admin> guardarAdmin(@Valid @RequestBody Admin admin) {
-        Admin adminGuardado = servicioAdmin.guardarAdmin(admin);
-        return new ResponseEntity<>(adminGuardado, HttpStatus.CREATED);
-    }
-
-    /** GET: Listar todos los admins. */
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public List<Admin> obtenerTodosLosAdmins() {
         return servicioAdmin.obtenerTodosLosAdmins();
     }
 
-    /** GET: Obtener admin por ID. */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Admin> obtenerAdminPorId(@PathVariable Long id) {
         try {
             Admin admin = servicioAdmin.obtenerAdminPorId(id);
@@ -50,9 +39,24 @@ public class AdminController {
         }
     }
 
-    /** DELETE: Eliminar admin. Solo ADMINISTRADOR. */
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Admin> actualizarAdmin(@PathVariable Long id, @RequestBody Admin adminDetalles) {
+        try {
+            Admin adminExistente = servicioAdmin.obtenerAdminPorId(id);
+            adminExistente.setNombre(adminDetalles.getNombre());
+            adminExistente.setApellidos(adminDetalles.getApellidos());
+            adminExistente.setEmail(adminDetalles.getEmail());
+            adminExistente.setEspecialidad(adminDetalles.getEspecialidad());
+            Admin adminActualizado = servicioAdmin.guardarAdmin(adminExistente);
+            return ResponseEntity.ok(adminActualizado);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> eliminarAdmin(@PathVariable Long id) {
         try {
             servicioAdmin.eliminarAdmin(id);
@@ -60,5 +64,12 @@ public class AdminController {
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/buscar")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<Admin>> buscarPorEspecialidad(@RequestParam String texto) {
+        List<Admin> admins = servicioAdmin.buscarPorEspecialidad(texto);
+        return admins.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(admins);
     }
 }

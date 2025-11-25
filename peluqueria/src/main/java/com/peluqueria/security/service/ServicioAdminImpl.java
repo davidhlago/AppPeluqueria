@@ -2,43 +2,38 @@ package com.peluqueria.security.service;
 
 import com.peluqueria.entity.Admin;
 import com.peluqueria.repository.AdminRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
-public class ServicioAdminImpl {
+public class ServicioAdminImpl implements ServicioAdmin {
 
-    private final AdminRepository adminRepository;
+    @Autowired
+    private AdminRepository adminRepository;
 
-    public ServicioAdminImpl(AdminRepository adminRepository) {
-        this.adminRepository = adminRepository;
-    }
-
+    @Override
     public Admin guardarAdmin(Admin admin) {
         return adminRepository.save(admin);
     }
 
+    @Override
     public List<Admin> obtenerTodosLosAdmins() {
         return adminRepository.findAll();
     }
 
+    @Override
     public Admin obtenerAdminPorId(Long id) {
-        return adminRepository.findById(id)
-                .orElseThrow(NoSuchElementException::new);
+        return adminRepository.findById(id).orElseThrow();
     }
 
-    public Admin actualizarAdmin(Long id, Admin detalles) {
-        Admin admin = obtenerAdminPorId(id);
-        admin.setEspecialidad(detalles.getEspecialidad());
-        return adminRepository.save(admin);
-    }
-
+    @Override
     public void eliminarAdmin(Long id) {
-        if (!adminRepository.existsById(id)) {
-            throw new NoSuchElementException();
-        }
         adminRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Admin> buscarPorEspecialidad(String texto) {
+        return adminRepository.buscarPorEspecialidad(texto);
     }
 }

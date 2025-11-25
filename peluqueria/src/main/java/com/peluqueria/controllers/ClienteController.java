@@ -23,23 +23,14 @@ public class ClienteController {
         this.servicioCliente = servicioCliente;
     }
 
-    /** POST: Crear un nuevo cliente. Público (registro). */
-    @PostMapping
-    public ResponseEntity<Cliente> guardarCliente(@Valid @RequestBody Cliente cliente) {
-        Cliente clienteGuardado = servicioCliente.guardarCliente(cliente);
-        return new ResponseEntity<>(clienteGuardado, HttpStatus.CREATED);
-    }
-
-    /** GET: Listar todos los clientes. Solo ADMINISTRADOR. */
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public List<Cliente> obtenerTodosLosClientes() {
         return servicioCliente.obtenerTodosLosClientes();
     }
 
-    /** GET: Obtener cliente por ID. ADMIN o el propio cliente. */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR') or #id == authentication.principal.id")
+    @PreAuthorize("hasAuthority('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<Cliente> obtenerClientePorId(@PathVariable Long id) {
         try {
             Cliente cliente = servicioCliente.obtenerClientePorId(id);
@@ -49,9 +40,8 @@ public class ClienteController {
         }
     }
 
-    /** PUT: Actualizar cliente. ADMIN o el propio cliente. */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR') or #id == authentication.principal.id")
+    @PreAuthorize("hasAuthority('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<Cliente> actualizarCliente(@PathVariable Long id, @Valid @RequestBody Cliente detallesCliente) {
         try {
             Cliente clienteActualizado = servicioCliente.actualizarCliente(id, detallesCliente);
@@ -61,9 +51,8 @@ public class ClienteController {
         }
     }
 
-    /** DELETE: Eliminar cliente. Solo ADMINISTRADOR. */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> eliminarCliente(@PathVariable Long id) {
         try {
             servicioCliente.eliminarCliente(id);
@@ -71,5 +60,12 @@ public class ClienteController {
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/buscar")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<Cliente>> buscarClientes(@RequestParam String texto) {
+        List<Cliente> clientes = servicioCliente.buscarObservacionesOAlergenos(texto);
+        return clientes.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(clientes);
     }
 }
