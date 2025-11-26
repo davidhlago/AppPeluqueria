@@ -37,33 +37,64 @@ public class PeluqueriaApplication {
 //http://localhost:8080/swagger-ui/index.html#/
 
 
-/*INSERT INTO `tipo_servicio` (`nombre`, `descripcion`) VALUES
-('Peluquería Mujer', 'Cortes, peinados y tratamientos para mujer'),
-('Peluquería Hombre', 'Cortes y barbería para caballero'),
-('Coloración', 'Tintes, mechas y baños de color'),
-('Estética Facial', 'Limpiezas, tratamientos anti-edad y mascarillas'),
-('Estética Corporal', 'Masajes y tratamientos reductores'),
-('Manicura', 'Cuidado y esmaltado de manos'),
-('Pedicura', 'Cuidado y tratamiento de pies'),
-('Depilación', 'Depilación con cera y láser'),
-('Maquillaje', 'Maquillaje social y de eventos'),
-('Tratamientos Capilares', 'Hidratación, anti-caída y alisados');
+/*INSERT INTO tipo_servicio (id, nombre, descripcion) VALUES
+(1, 'Peluquería', 'Servicios de corte, coloración, peinado y tratamientos capilares.'),
+(2, 'Manicura y Pedicura', 'Cuidado y esmaltado de uñas de manos y pies, incluyendo tratamientos de parafina.'),
+(3, 'Depilación', 'Servicios de eliminación de vello facial y corporal (cera o métodos similares).'),
+(4, 'Pestañas y Cejas', 'Servicios especializados como lifting, laminado y tinte.'),
+(5, 'Tratamientos Faciales', 'Limpieza profunda, hidratación y tratamientos de antienvejecimiento o específicos para la piel.'),
+(6, 'Tratamientos Corporales', 'Masajes, drenaje linfático, exfoliación y tratamientos reductores.');
 
 
 
 
 
-INSERT INTO `servicio` (`nombre`, `descripcion`, `duracion_bloques`, `precio`, `tipo_servicio_id`) VALUES
-('Corte Bob', 'Corte estilo Bob clásico con lavado', 2, 25.50, 1),
-('Afeitado Navaja', 'Afeitado tradicional con toalla caliente', 1, 15.00, 2),
-('Mechas Balayage', 'Técnica de degradado natural', 4, 60.00, 3),
-('Limpieza Profunda', 'Limpieza facial con extracción y vapor', 2, 35.00, 4),
-('Masaje Relajante', 'Masaje de cuerpo entero con aceites', 3, 45.00, 5),
-('Manicura Semipermanente', 'Limado y esmaltado de larga duración', 1, 18.00, 6),
-('Pedicura Spa', 'Tratamiento completo de pies con hidratación', 2, 28.00, 7),
-('Depilación Piernas', 'Depilación con cera tibia piernas enteras', 1, 22.00, 8),
-('Maquillaje Novia', 'Prueba y maquillaje para el día de la boda', 3, 150.00, 9),
-('Alisado Keratina', 'Tratamiento alisador y reparador', 5, 120.00, 10);
+INSERT INTO servicio (id_servicio, nombre, descripcion, precio, duracion_bloques, tipo_servicio_id) VALUES
+(1, 'Lavado + Peinado', 'Lavado y peinado básico para todo tipo de cabello', 5, 2, 1),
+(2, 'Lavado + Peinado + Recogido', 'Peinado con recogido para eventos o ocasiones especiales', 12, 3, 1),
+(3, 'Corte femenino', 'Corte de cabello para mujer con lavado incluido', 5, 3, 1),
+(4, 'Corte masculino', 'Corte de cabello para hombre con lavado incluido', 2, 2, 1),
+(5, 'Color completo', 'Aplicación de color en todo el cabello', 8, 2.5, 1),
+(6, 'Color raíces', 'Aplicación de color solo en raíces', 5, 2.5, 1),
+(7, 'Mechas', 'Técnica de coloración parcial para dar luz al cabello', 10, 4, 1),
+(8, 'Cambio de estilo + color', 'Transformación completa del look con nuevo color', 15, 3, 1),
+(9, 'Permanente', 'Cambio de forma del cabello mediante técnica permanente', 10, 4, 1),
+(10, 'Tratamiento capilar', 'Tratamiento nutritivo y reparador para el cabello', 5, 3, 1),
+(11, 'Manicura exprés', 'Limpieza y limado de uñas sin esmaltado', 2, 0.75, 2),
+(12, 'Manicura completa semipermanente', 'Manicura con esmaltado semipermanente de larga duración', 5, 1.5, 2),
+(13, 'Pedicura semipermanente', 'Pedicura con esmaltado semipermanente', 5, 1.5, 2),
+(14, 'Parafina manos', 'Tratamiento hidratante con baño de parafina', 2, 1, 2),
+(15, 'Uñas artificiales', 'Aplicación de uñas postizas con acabado profesional', 10, 3, 2),
+(16, 'Manicura semipermanente', 'Manicura con esmaltado semipermanente', 5, 2, 2),
+(17, 'Manicura normal', 'Manicura básica con esmaltado tradicional', 2, 1, 2),
+(18, 'Depilación facial', 'Eliminación de vello en labio, cejas, mentón y zonas faciales', 3, 0.5, 3),
+(19, 'Diseño de cejas', 'Moldeado y definición de cejas según el rostro', 2, 0.5, 3),
+(20, 'Depilación de axilas', 'Eliminación de vello en la zona de las axilas', 4, 0.3, 3),
+(21, 'Depilación de brazos', 'Depilación completa de ambos brazos', 6, 0.5, 3),
+(22, 'Depilación medias piernas', 'Depilación desde rodilla hasta tobillo', 8, 0.5, 3),
+(23, 'Depilación piernas completas', 'Depilación total de ambas piernas', 10, 1, 3),
+(24, 'Depilación ingles', 'Depilación básica en zona íntima', 4, 0.5, 3),
+(25, 'Depilación brasileña', 'Depilación íntima estilo brasileño', 5, 0.75, 3),
+(26, 'Depilación integral', 'Depilación completa en zona íntima', 6, 0.75, 3),
+(27, 'Depilación espalda', 'Eliminación de vello en espalda completa', 4, 0.75, 3),
+(28, 'Depilación abdomen', 'Eliminación de vello en zona abdominal', 3, 0.5, 3),
+(29, 'Pack completo', 'Depilación de cejas, labio, axilas, piernas completas e ingles', 18, 1.5, 3),
+(30, 'Lifting pestañas', 'Elevación de pestañas naturales para efecto rizado', 8, 0.75, 4),
+(31, 'Laminado cejas', 'Alisado y fijación de cejas para forma definida', 8, 0.75, 4),
+(32, 'Tinte pestañas', 'Coloración de pestañas para mayor intensidad', 5, 0.5, 4),
+(33, 'Lifting + Tinte pestañas', 'Elevación y coloración de pestañas en una sola sesión', 12, 1, 4),
+(34, 'Drenaje linfático facial', 'Masaje facial para mejorar circulación y eliminar toxinas', 3, 1, 5),
+(35, 'Higiene facial', 'Limpieza profunda de la piel del rostro', 0, 1.5, 5),
+(36, 'Profunda facial', 'Tratamiento facial intensivo con extracción y mascarilla', 15, 1.5, 5),
+(37, 'Hidratación facial', 'Tratamiento para restaurar la hidratación de la piel', 15, 1.5, 5),
+(38, 'Antienvejecimiento', 'Tratamiento facial para reducir signos de edad', 15, 1.5, 5),
+(39, 'Vitamina C', 'Tratamiento facial antioxidante con vitamina C', 15, 1.5, 5),
+(40, 'Pieles grasas', 'Tratamiento facial para controlar el exceso de grasa', 15, 1.5, 5),
+(41, 'Despigmentante', 'Tratamiento para reducir manchas y unificar tono', 15, 1.5, 5),
+(42, 'Bolsas y ojeras', 'Tratamiento para mejorar la apariencia del contorno de ojos', 15, 1.5, 5),
+(43, 'Drenaje linfático corporal', 'Masaje corporal para mejorar circulación y eliminar líquidos', 6, 1.5, 6),
+(44, 'Drenaje linfático completo', 'Masaje completo para activar el sistema linfático', 8, 2.5, 6),
+(45, 'Exfoliación corporal', 'Eliminación de células muertas y renovación de la piel', 10, 1, 6);
 
 
 
