@@ -48,6 +48,7 @@ public class AdminController {
             adminExistente.setApellidos(adminDetalles.getApellidos());
             adminExistente.setEmail(adminDetalles.getEmail());
             adminExistente.setEspecialidad(adminDetalles.getEspecialidad());
+
             Admin adminActualizado = servicioAdmin.guardarAdmin(adminExistente);
             return ResponseEntity.ok(adminActualizado);
         } catch (NoSuchElementException e) {

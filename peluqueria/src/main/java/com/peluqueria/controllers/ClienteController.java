@@ -2,10 +2,12 @@ package com.peluqueria.controllers;
 
 import com.peluqueria.entity.Cliente;
 import com.peluqueria.security.service.ServicioCliente;
+import com.peluqueria.security.service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -24,9 +26,20 @@ public class ClienteController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public List<Cliente> obtenerTodosLosClientes() {
-        return servicioCliente.obtenerTodosLosClientes();
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
+    public List<Cliente> obtenerClientes(Authentication authentication) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        boolean esAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+
+        if (esAdmin) {
+            return servicioCliente.obtenerTodosLosClientes();
+        } else {
+            Long idUsuario = userDetails.getId();
+            Cliente miPerfil = servicioCliente.obtenerClientePorId(idUsuario);
+            return List.of(miPerfil);
+        }
     }
 
     @GetMapping("/{id}")

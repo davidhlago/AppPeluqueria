@@ -2,10 +2,12 @@ package com.peluqueria.controllers;
 
 import com.peluqueria.entity.Grupo;
 import com.peluqueria.security.service.ServicioGrupo;
+import com.peluqueria.security.service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -24,8 +26,19 @@ public class GrupoController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
-    public List<Grupo> obtenerTodosLosGrupos() {
-        return servicioGrupo.obtenerTodosLosGrupos();
+    public List<Grupo> obtenerTodosLosGrupos(Authentication authentication) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        boolean esAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+
+        if (esAdmin) {
+            return servicioGrupo.obtenerTodosLosGrupos();
+        } else {
+            Long idUsuario = userDetails.getId();
+            Grupo miGrupo = servicioGrupo.obtenerGrupoPorId(idUsuario);
+            return List.of(miGrupo);
+        }
     }
 
     @GetMapping("/{id}")
@@ -44,11 +57,13 @@ public class GrupoController {
     public ResponseEntity<Grupo> actualizarGrupo(@PathVariable Long id, @RequestBody Grupo detallesGrupo) {
         try {
             Grupo grupoExistente = servicioGrupo.obtenerGrupoPorId(id);
+
             grupoExistente.setNombre(detallesGrupo.getNombre());
             grupoExistente.setApellidos(detallesGrupo.getApellidos());
             grupoExistente.setEmail(detallesGrupo.getEmail());
             grupoExistente.setCurso(detallesGrupo.getCurso());
             grupoExistente.setTurno(detallesGrupo.getTurno());
+
             Grupo grupoActualizado = servicioGrupo.guardarGrupo(grupoExistente);
             return ResponseEntity.ok(grupoActualizado);
         } catch (NoSuchElementException e) {
