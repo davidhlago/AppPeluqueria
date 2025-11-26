@@ -20,7 +20,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 3600)//la hora
 public class AuthController {
 
     @Autowired
@@ -50,12 +50,12 @@ public class AuthController {
         com.peluqueria.security.service.UserDetailsImpl userDetails =
                 (com.peluqueria.security.service.UserDetailsImpl) authentication.getPrincipal();
 
-        String rol = userDetails.getAuthorities().stream()
-                .findFirst()
-                .map(a -> a.getAuthority())
-                .orElse(null);
+        String rol = userDetails.getAuthorities().stream()//obtiene la lista de role
+                .findFirst()//toma la primera autoridad
+                .map(a -> a.getAuthority())//extrae el nombre del rol
+                .orElse(null);//si no null
 
-        String jwt = jwtUtils.generarToken(userDetails.getUsername(), rol);
+        String jwt = jwtUtils.generarToken(userDetails.getUsername(), rol);//crea el token usando nombre y rol
 
         return ResponseEntity.ok(new JwtResponse(
                 jwt,

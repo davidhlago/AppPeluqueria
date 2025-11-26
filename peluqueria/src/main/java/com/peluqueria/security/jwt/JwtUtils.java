@@ -19,7 +19,7 @@ public class JwtUtils {
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
-    }
+    }//convierte el secret en una clave valida
 
     public String generarToken(String username, String rol) {
         return Jwts.builder()
@@ -58,3 +58,4 @@ public class JwtUtils {
         }
     }
 }
+//crear, validar y leer los tokens JWT

@@ -80,3 +80,5 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         return null;
     }
 }
+
+//filtro intercepta cada petición, extrae y valida el JWT y, si es correcto, autentica al usuario en Spring Security

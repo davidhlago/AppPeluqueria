@@ -18,3 +18,5 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: No autorizado");
     }
 }
+
+//hacer cuando un usuario intenta acceder a un recurso protegido sin estar autenticado

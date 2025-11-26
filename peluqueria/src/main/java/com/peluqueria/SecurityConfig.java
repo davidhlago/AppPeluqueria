@@ -32,12 +32,12 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
-    }
+    }//autentica usuarios cuando hacen login
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
+    }//encriptar
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -45,12 +45,12 @@ public class SecurityConfig {
         authProvider.setUserDetailsService(userDetailsService); // busca por username
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
-    }
+    }//para login
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable())//api no use sesiones y cookies
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/test/**").permitAll()
@@ -61,11 +61,13 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
 
-                        .anyRequest().authenticated()
+                        .anyRequest().authenticated()//necesita token
                 )
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);//revisa si la peticion trae jwt valido
 
         return http.build();
     }
 }
+
+//configura toda la seguridad permisos autenticaion filtros jwt, contraseñas
