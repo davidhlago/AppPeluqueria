@@ -18,4 +18,6 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
     @Query("SELECT c FROM Cliente c WHERE c.observacion LIKE %:texto% OR c.alergenos LIKE %:texto%")
     List<Cliente> buscarEnObservacionesOAlergenos(@Param("texto") String texto);
+
+    List<Cliente> findByGrupoId(Long grupoId);
 }

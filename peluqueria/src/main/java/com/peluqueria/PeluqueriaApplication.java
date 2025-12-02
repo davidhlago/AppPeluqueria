@@ -12,6 +12,8 @@ public class PeluqueriaApplication {
 
 }
 
+/*en sql para q muestra los clientes iniciando sesion como el grupo
+* UPDATE cliente SET grupo_id = 9 WHERE id = 5;*/
 
 /*
 *  post http://localhost:8080/api/auth/signup/admin

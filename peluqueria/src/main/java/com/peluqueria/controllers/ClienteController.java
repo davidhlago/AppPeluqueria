@@ -26,15 +26,16 @@ public class ClienteController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE') or hasAuthority('GRUPO')")
     public List<Cliente> obtenerClientes(Authentication authentication) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        boolean esAdmin = userDetails.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+        String rol = userDetails.getAuthorities().iterator().next().getAuthority();
 
-        if (esAdmin) {
+        if ("ADMIN".equals(rol)) {
             return servicioCliente.obtenerTodosLosClientes();
+        } else if ("GRUPO".equals(rol)) {
+            return servicioCliente.obtenerClientesPorGrupo(userDetails.getId());
         } else {
             Long idUsuario = userDetails.getId();
             Cliente miPerfil = servicioCliente.obtenerClientePorId(idUsuario);

@@ -1,8 +1,6 @@
 package com.peluqueria.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.*;
 
 @Entity
 @DiscriminatorValue("CLIENTE")
@@ -20,11 +18,15 @@ public class Cliente extends Usuario {
     @Column(length = 255)
     private String direccion;
 
+    @ManyToOne
+    @JoinColumn(name = "grupo_id")
+    private Grupo grupo;
+
     public Cliente() {}
 
     public Cliente(String nombre, String apellidos, String username, String email, String password,
                    String telefono, String observacion, String alergenos, String direccion) {
-        super(nombre, apellidos, username, email, password);
+        super(nombre, apellidos, username, email, password, "CLIENTE");
         this.telefono = telefono;
         this.observacion = observacion;
         this.alergenos = alergenos;
@@ -42,4 +44,7 @@ public class Cliente extends Usuario {
 
     public String getDireccion() { return direccion; }
     public void setDireccion(String direccion) { this.direccion = direccion; }
+
+    public Grupo getGrupo() { return grupo; }
+    public void setGrupo(Grupo grupo) { this.grupo = grupo; }
 }

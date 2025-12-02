@@ -10,4 +10,5 @@ public interface ServicioCliente {
     Cliente actualizarCliente(Long id, Cliente cliente);
     void eliminarCliente(Long id);
     List<Cliente> buscarObservacionesOAlergenos(String texto);
+    List<Cliente> obtenerClientesPorGrupo(Long idGrupo);
 }

@@ -37,6 +37,7 @@ public class ServicioClienteImpl implements ServicioCliente {
         cliente.setObservacion(detallesCliente.getObservacion());
         cliente.setAlergenos(detallesCliente.getAlergenos());
         cliente.setDireccion(detallesCliente.getDireccion());
+        cliente.setGrupo(detallesCliente.getGrupo());
         return clienteRepository.save(cliente);
     }
 
@@ -48,5 +49,10 @@ public class ServicioClienteImpl implements ServicioCliente {
     @Override
     public List<Cliente> buscarObservacionesOAlergenos(String texto) {
         return clienteRepository.buscarEnObservacionesOAlergenos(texto);
+    }
+
+    @Override
+    public List<Cliente> obtenerClientesPorGrupo(Long idGrupo) {
+        return clienteRepository.findByGrupoId(idGrupo);
     }
 }
