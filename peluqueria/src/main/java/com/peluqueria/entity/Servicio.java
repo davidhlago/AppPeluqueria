@@ -1,5 +1,6 @@
 package com.peluqueria.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,9 +11,9 @@ public class Servicio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idServicio;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tipo_servicio_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private TipoServicio tipoServicio;
 
     @Column(nullable = false)
@@ -26,6 +27,9 @@ public class Servicio {
 
     @Column(nullable = false)
     private double precio;
+
+    public Servicio() {
+    }
 
     public Servicio(Long idServicio, TipoServicio tipoServicio, String nombre, String descripcion, int duracionBloques, double precio) {
         this.idServicio = idServicio;
