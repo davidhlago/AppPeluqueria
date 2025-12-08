@@ -25,22 +25,48 @@ public class UsuarioController {
         this.servicioUsuario = servicioUsuario;
     }
 
-    @GetMapping
+    // ----------------------------------------------------------------------------------
+    // 1. ENDPOINT DEDICADO: /api/usuarios/me (PERFIL DEL USUARIO AUTENTICADO)
+    // ----------------------------------------------------------------------------------
+    // Devuelve un ÚNICO objeto (ResponseEntity<Usuario>), asegurando la corrección en C#.
+
+    @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public List<Usuario> obtenerTodosLosUsuarios(Authentication authentication) {
+    public ResponseEntity<Usuario> obtenerPerfilUsuarioActual(Authentication authentication) {
+        // 1. Obtener los detalles del usuario a partir del token JWT
+        //    (Spring ya ha verificado el token y ha inyectado el objeto UserDetails).
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        boolean esAdmin = userDetails.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+        // 2. Usar el ID (o el username, si lo prefieres) para obtener el objeto completo de la DB.
+        Long idUsuario = userDetails.getId();
 
-        if (esAdmin) {
-            return servicioUsuario.obtenerTodosLosUsuarios();
-        } else {
-            Long idUsuario = userDetails.getId();
-            Usuario miUsuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
-            return List.of(miUsuario);
+        try {
+            Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
+
+            // 🚨 IMPORTANTE: Devolver ResponseEntity.ok(usuario) devuelve UN SOLO OBJETO, no un array.
+            // Esto corrige el parseo JSON en tu aplicación C#.
+            return ResponseEntity.ok(usuario);
+        } catch (NoSuchElementException e) {
+            // Esto solo ocurriría si el token es válido pero el usuario fue borrado de la DB.
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    // ----------------------------------------------------------------------------------
+    // 2. ENDPOINT /api/usuarios (SOLO PARA ADMINS: LISTA COMPLETA)
+    // ----------------------------------------------------------------------------------
+    // Se ajusta la lógica para que solo los ADMIN puedan obtener la lista completa,
+    // y se elimina la lógica de devolver solo un usuario si no es admin (ya cubierto por /me).
+
+    @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')") // Solo ADMINs pueden ver la lista completa
+    public List<Usuario> obtenerTodosLosUsuarios() {
+        return servicioUsuario.obtenerTodosLosUsuarios();
+    }
+
+    // ----------------------------------------------------------------------------------
+    // RESTO DE MÉTODOS (Sin cambios)
+    // ----------------------------------------------------------------------------------
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN') or #id == authentication.principal.id")
