@@ -80,7 +80,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @Valid @RequestBody Usuario detallesUsuario) {
         try {
             Usuario usuarioActualizado = servicioUsuario.actualizarUsuario(id, detallesUsuario);
