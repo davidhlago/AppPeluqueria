@@ -16,6 +16,8 @@ public class HorarioSemanal {
     private LocalTime horaInicio;
     private LocalTime horaFin;
 
+    private Integer cupoMaximo;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_grupo")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -28,6 +30,7 @@ public class HorarioSemanal {
 
     public HorarioSemanal() {}
 
+    // Getters y Setters
     public Long getIdHorarioSemana() { return idHorarioSemana; }
     public void setIdHorarioSemana(Long idHorarioSemana) { this.idHorarioSemana = idHorarioSemana; }
 
@@ -39,6 +42,10 @@ public class HorarioSemanal {
 
     public LocalTime getHoraFin() { return horaFin; }
     public void setHoraFin(LocalTime horaFin) { this.horaFin = horaFin; }
+
+    // GETTER Y SETTER NUEVOS PARA EL CUPO
+    public Integer getCupoMaximo() { return cupoMaximo; }
+    public void setCupoMaximo(Integer cupoMaximo) { this.cupoMaximo = cupoMaximo; }
 
     public Grupo getGrupo() { return grupo; }
     public void setGrupo(Grupo grupo) { this.grupo = grupo; }
