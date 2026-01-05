@@ -1,0 +1,426 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 05-01-2026 a las 19:01:54
+-- Versión del servidor: 10.4.32-MariaDB
+-- Versión de PHP: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de datos: `serviciopeluqueria`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `admin`
+--
+
+CREATE TABLE `admin` (
+  `especialidad` varchar(255) DEFAULT NULL,
+  `id` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `admin`
+--
+
+INSERT INTO `admin` (`especialidad`, `id`) VALUES
+('Recursos Humanos', 2),
+('Marketing Digital', 3),
+('Contabilidad', 4),
+('Gestión de Personal', 12),
+('Marketing Digital', 16);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `citas`
+--
+
+CREATE TABLE `citas` (
+  `id_cita` bigint(20) NOT NULL,
+  `estado` varchar(255) DEFAULT NULL,
+  `fecha` date DEFAULT NULL,
+  `hora_fin` time(6) DEFAULT NULL,
+  `hora_inicio` time(6) DEFAULT NULL,
+  `id_alumno` bigint(20) DEFAULT NULL,
+  `id_cliente` bigint(20) DEFAULT NULL,
+  `id_grupo` bigint(20) DEFAULT NULL,
+  `id_servicio` bigint(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `citas`
+--
+
+INSERT INTO `citas` (`id_cita`, `estado`, `fecha`, `hora_fin`, `hora_inicio`, `id_alumno`, `id_cliente`, `id_grupo`, `id_servicio`) VALUES
+(1, 'PENDIENTE', '2025-12-29', '11:00:00.000000', '10:00:00.000000', 10, 5, 9, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `cliente`
+--
+
+CREATE TABLE `cliente` (
+  `alergenos` varchar(255) DEFAULT NULL,
+  `direccion` varchar(255) DEFAULT NULL,
+  `observacion` varchar(255) DEFAULT NULL,
+  `telefono` varchar(255) DEFAULT NULL,
+  `id` bigint(20) NOT NULL,
+  `grupo_id` bigint(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `cliente`
+--
+
+INSERT INTO `cliente` (`alergenos`, `direccion`, `observacion`, `telefono`, `id`, `grupo_id`) VALUES
+('Alergia al Trabajo', 'Calle Mayor 10, 2A', 'Prefiere citas por la mañana', '600111222', 5, 9),
+('Ninguno', 'Av. Libertad 45', 'Cuero cabelludo sensible', '600333444', 6, NULL),
+('Alergia al Amoniaco', 'Plaza España 1', 'Suele venir con su hija', '600555666', 7, NULL),
+('Ninguno', 'Calle Pez 8', 'Le gusta el café solo', '600777888', 8, NULL),
+('Ninguno', 'Plaza Mayor 5', 'Primera vez', '611222333', 13, NULL),
+('Ninguno', 'Calle Falsa 123', 'Piel sensible', '655444333', 14, NULL),
+('Alergia al Trabajoksjbf', 'Calle Mayor 10, 2A', 'Prefiere citas por la mañana', '600111222', 15, NULL),
+(NULL, NULL, NULL, NULL, 17, NULL),
+(NULL, NULL, NULL, NULL, 18, NULL),
+(NULL, NULL, NULL, NULL, 19, NULL),
+(NULL, NULL, NULL, NULL, 20, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `grupo`
+--
+
+CREATE TABLE `grupo` (
+  `curso` varchar(255) DEFAULT NULL,
+  `turno` varchar(255) DEFAULT NULL,
+  `id` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `grupo`
+--
+
+INSERT INTO `grupo` (`curso`, `turno`, `id`) VALUES
+('1º Peluquería', 'Mañana', 9),
+('1º Estética', 'Tarde', 10),
+('2º Peluquería', 'Mañana', 11);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `horario_semanal`
+--
+
+CREATE TABLE `horario_semanal` (
+  `id_horario_semana` bigint(20) NOT NULL,
+  `dias_semana` varchar(255) DEFAULT NULL,
+  `hora_fin` time(6) DEFAULT NULL,
+  `hora_inicio` time(6) DEFAULT NULL,
+  `id_grupo` bigint(20) DEFAULT NULL,
+  `id_servicio` bigint(20) DEFAULT NULL,
+  `cupo_maximo` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `horario_semanal`
+--
+
+INSERT INTO `horario_semanal` (`id_horario_semana`, `dias_semana`, `hora_fin`, `hora_inicio`, `id_grupo`, `id_servicio`, `cupo_maximo`) VALUES
+(1, 'Lunes', '14:00:00.000000', '09:00:00.000000', 9, 1, 2),
+(2, 'Martes', '20:00:00.000000', '15:00:00.000000', 10, 11, 5),
+(3, 'Miércoles', '14:00:00.000000', '09:00:00.000000', 11, 3, 10),
+(4, 'Jueves', '14:00:00.000000', '09:00:00.000000', 9, 4, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `servicio`
+--
+
+CREATE TABLE `servicio` (
+  `id_servicio` bigint(20) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  `duracion_bloques` int(11) NOT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `precio` double NOT NULL,
+  `tipo_servicio_id` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `servicio`
+--
+
+INSERT INTO `servicio` (`id_servicio`, `descripcion`, `duracion_bloques`, `nombre`, `precio`, `tipo_servicio_id`) VALUES
+(1, 'Lavado y peinado básico para todo tipo de cabello', 200, 'Lavado + Peinado', 500, 1),
+(2, 'Peinado con recogido para eventos o ocasiones especiales', 3, 'Lavado + Peinado + Recogido', 12, 1),
+(3, 'Corte de cabello para mujer con lavado incluido', 3, 'Corte femenino', 5, 1),
+(4, 'Corte de cabello para hombre con lavado incluido', 2, 'Corte masculino', 2, 1),
+(5, 'Aplicación de color en todo el cabello', 3, 'Color completo', 8, 1),
+(6, 'Aplicación de color solo en raíces', 3, 'Color raíces', 5, 1),
+(7, 'Técnica de coloración parcial para dar luz al cabello', 4, 'Mechas', 10, 1),
+(8, 'Transformación completa del look con nuevo color', 3, 'Cambio de estilo + color', 15, 1),
+(9, 'Cambio de forma del cabello mediante técnica permanente', 4, 'Permanente', 10, 1),
+(10, 'Tratamiento nutritivo y reparador para el cabello', 3, 'Tratamiento capilar', 5, 1),
+(11, 'Limpieza y limado de uñas sin esmaltado', 1, 'Manicura exprés', 2, 2),
+(12, 'Manicura con esmaltado semipermanente de larga duración', 2, 'Manicura completa semipermanente', 5, 2),
+(13, 'Pedicura con esmaltado semipermanente', 2, 'Pedicura semipermanente', 5, 2),
+(14, 'Tratamiento hidratante con baño de parafina', 1, 'Parafina manos', 2, 2),
+(15, 'Aplicación de uñas postizas con acabado profesional', 3, 'Uñas artificiales', 10, 2),
+(16, 'Manicura con esmaltado semipermanente', 2, 'Manicura semipermanente', 5, 2),
+(17, 'Manicura básica con esmaltado tradicional', 1, 'Manicura normal', 2, 2),
+(19, 'Moldeado y definición de cejas según el rostro', 1, 'Diseño de cejas', 2, 3),
+(20, 'Eliminación de vello en la zona de las axilas', 0, 'Depilación de axilas', 4, 3),
+(21, 'Depilación completa de ambos brazos', 1, 'Depilación de brazos', 6, 3),
+(22, 'Depilación desde rodilla hasta tobillo', 1, 'Depilación medias piernas', 8, 3),
+(23, 'Depilación total de ambas piernas', 1, 'Depilación piernas completas', 10, 3),
+(24, 'Depilación básica en zona íntima', 1, 'Depilación ingles', 4, 3),
+(25, 'Depilación íntima estilo brasileño', 1, 'Depilación brasileña', 5, 3),
+(26, 'Depilación completa en zona íntima', 1, 'Depilación integral', 6, 3),
+(27, 'Eliminación de vello en espalda completa', 1, 'Depilación espalda', 4, 3),
+(28, 'Eliminación de vello en zona abdominal', 1, 'Depilación abdomen', 3, 3),
+(29, 'Depilación de cejas, labio, axilas, piernas completas e ingles', 2, 'Pack completo', 18, 3),
+(30, 'Elevación de pestañas naturales para efecto rizado', 1, 'Lifting pestañas', 8, 4),
+(31, 'Alisado y fijación de cejas para forma definida', 1, 'Laminado cejas', 8, 4),
+(32, 'Coloración de pestañas para mayor intensidad', 1, 'Tinte pestañas', 5, 4),
+(33, 'Elevación y coloración de pestañas en una sola sesión', 1, 'Lifting + Tinte pestañas', 12, 4),
+(34, 'Masaje facial para mejorar circulación y eliminar toxinas', 1, 'Drenaje linfático facial', 3, 5),
+(35, 'Limpieza profunda de la piel del rostro', 2, 'Higiene facial', 0, 5),
+(36, 'Tratamiento facial intensivo con extracción y mascarilla', 2, 'Profunda facial', 15, 5),
+(38, 'Tratamiento facial para reducir signos de edad', 2, 'Antienvejecimiento', 15, 5),
+(39, 'Tratamiento facial antioxidante con vitamina C', 2, 'Vitamina C', 15, 5),
+(40, 'Tratamiento facial para controlar el exceso de grasa', 2, 'Pieles grasas', 15, 5),
+(41, 'Tratamiento para reducir manchas y unificar tono', 2, 'Despigmentante', 15, 5),
+(42, 'Tratamiento para mejorar la apariencia del contorno de ojos', 2, 'Bolsas y ojeras', 15, 5),
+(43, 'Masaje corporal para mejorar circulación y eliminar líquidos', 2, 'Drenaje linfático corporal', 6, 6),
+(44, 'Masaje completo para activar el sistema linfático', 3, 'Drenaje linfático completo', 8, 6),
+(45, 'Eliminación de células muertas y renovación de la piel', 1, 'Exfoliación corporal', 10, 6),
+(46, 'Tratamiento alisador permanente de larga duración', 6, 'Alisado Japonés', 150, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tipo_servicio`
+--
+
+CREATE TABLE `tipo_servicio` (
+  `id` bigint(20) NOT NULL,
+  `descripcion` varchar(255) DEFAULT NULL,
+  `nombre` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tipo_servicio`
+--
+
+INSERT INTO `tipo_servicio` (`id`, `descripcion`, `nombre`) VALUES
+(1, 'Servicios de corte, coloración, peinado y tratamientos capilares.', 'Peluquería'),
+(2, 'Cuidado y esmaltado de uñas de manos y pies.', 'Manicura y Pedicura'),
+(3, 'Servicios de eliminación de vello facial y corporal.', 'Depilación'),
+(4, 'Servicios de lifting, laminado y tinte para pestañas y cejas.', 'Pestañas y Cejas'),
+(5, 'Higiene, hidratación y tratamientos específicos para la piel del rostro.', 'Tratamientos Faciales'),
+(6, 'Masajes, drenaje linfático y exfoliación corporal.', 'Tratamientos Corporales');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `usuarios`
+--
+
+CREATE TABLE `usuarios` (
+  `tipo_usuario` varchar(31) NOT NULL,
+  `id` bigint(20) NOT NULL,
+  `apellidos` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `nombre` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `rol` varchar(255) DEFAULT NULL,
+  `username` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `usuarios`
+--
+
+INSERT INTO `usuarios` (`tipo_usuario`, `id`, `apellidos`, `email`, `nombre`, `password`, `rol`, `username`) VALUES
+('ADMIN', 2, 'Gomez_nuevo', 'laura.admin@peluqueria.com', 'Laura_nuevo', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'ADMIN', 'admin_laura_nuevo'),
+('ADMIN', 3, 'Martinez', 'david.admin@peluqueria.com', 'David', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'ADMIN', 'admin_david'),
+('ADMIN', 4, 'Vazquez', 'elena.admin@peluqueria.com', 'Elena', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'ADMIN', 'admin_elena'),
+('CLIENTE', 5, 'Torres', 'ana.torres@gmail.com', 'Ana', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'CLIENTE', 'cliente_ana'),
+('CLIENTE', 6, 'Ruiz', 'javier.ruiz@hotmail.com', 'Javier', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'CLIENTE', 'cliente_javi'),
+('CLIENTE', 7, 'López', 'sofia.lopez@yahoo.com', 'Sofia', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'CLIENTE', 'cliente_sofia'),
+('CLIENTE', 8, 'Angel', 'miguel.angel@outlook.com', 'Miguel', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'CLIENTE', 'cliente_miguel'),
+('GRUPO', 9, '1A', 'grupo.1a@escuela.com', 'Clase', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'GRUPO', 'grupo_1a'),
+('GRUPO', 10, '1B', 'grupo.1b@escuela.com', 'Clase', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'GRUPO', 'grupo_1b'),
+('GRUPO', 11, '2A', 'grupo.2a@escuela.com', 'Clase', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'GRUPO', 'grupo_2a'),
+('ADMIN', 12, 'Díaz', 'marta.admin@peluqueria.com', 'Marta', '$2a$10$ImBVoCUn./e9h6NbD1VWzOgdP0OQhWqAJBUEg6AySS4rOMmJhO.US', 'ADMIN', 'admin_marta'),
+('CLIENTE', 13, 'Méndez', 'lucia@email.com', 'Lucía', '$2a$10$o9XPgXyi3Adp6WUtBJ7dx.iEkoORndupKh0qzGOMedp3FZa/WjGYW', 'CLIENTE', 'lucia.user'),
+('CLIENTE', 14, 'Vargas', 'elena@email.com', 'Elena', '$2a$10$gNN3BfYXbDdPLMxB9jytdunvo9fUhZCy0PSgECTrYejL77Cm/rsGK', 'CLIENTE', 'elena.vargas'),
+('CLIENTE', 15, 'lamichhane', 'suman@gmail.com', 'suman', '$2a$10$tEjfk/g9OtUoh1tHvqWGIeMRPRIdiEErB/opn8CEJMcAQZPtSIOsy', 'CLIENTE', 'cliente_suman'),
+('ADMIN', 16, 'Apellidos...', 'davidaa.admin@peluqueria.com', 'aa', '$2a$10$Jyg6uOGkIZhn4HHRrSLrqu8YX.m2WoSCKEHm/omBHYtWFHyG8ZpnO', 'ADMIN', 'a'),
+('CLIENTE', 17, 'lamichhane', 'lamichhanesuman79@gmail.com', 'suman', '$2a$10$RmB1pwDTVkDjitHt0otyiO5Oqf2ZGsirhSsKXiIuPw4tyZR7VRhI.', 'CLIENTE', 'sumlan'),
+('CLIENTE', 18, 'lula', 'lulelala@test.com', 'lale', '$2a$10$1Dd2PUO3MKaCVRWuILaooOQJ6G/FKzylPGjCFviH4PiqQH5UKofq.', 'CLIENTE', 'cliente_lale'),
+('CLIENTE', 19, 'xata', 'okxata@gmail.com', 'ok', '$2a$10$yt58DpTGQU3WRh37Oya3sur6gfTA2d7KNgj0lN7hv77uqLR.yh1VC', 'CLIENTE', 'cliente_ok'),
+('CLIENTE', 20, 'shyam', 'ramshyam@gmail.com', 'ram', '$2a$10$n2sLYmelOY0vRloXr8YVS.Amj1nEYurqRE9xCvQhHoh3tWHbdBaj.', 'CLIENTE', 'cliente_ram');
+
+--
+-- Índices para tablas volcadas
+--
+
+--
+-- Indices de la tabla `admin`
+--
+ALTER TABLE `admin`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `citas`
+--
+ALTER TABLE `citas`
+  ADD PRIMARY KEY (`id_cita`),
+  ADD KEY `FKif7nlo11p8nwqq4lhtgmmt5w3` (`id_alumno`),
+  ADD KEY `FKjkd00dq43rrhc7mse8pibn3d3` (`id_cliente`),
+  ADD KEY `FK7gieydedar8e8kbydi6xmx1s3` (`id_grupo`),
+  ADD KEY `FKa22phicdmngtdcj74aq926dsc` (`id_servicio`);
+
+--
+-- Indices de la tabla `cliente`
+--
+ALTER TABLE `cliente`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKi00831t74lxfvnayicnwovcp5` (`grupo_id`);
+
+--
+-- Indices de la tabla `grupo`
+--
+ALTER TABLE `grupo`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `horario_semanal`
+--
+ALTER TABLE `horario_semanal`
+  ADD PRIMARY KEY (`id_horario_semana`),
+  ADD KEY `FKe3y9sudwf3w5vbgy8mphvcq96` (`id_grupo`),
+  ADD KEY `FK4o3hudak4t9pxpwdgtrh2add0` (`id_servicio`);
+
+--
+-- Indices de la tabla `servicio`
+--
+ALTER TABLE `servicio`
+  ADD PRIMARY KEY (`id_servicio`),
+  ADD KEY `FK5g48yc2sr5ecks0ay9leesuv2` (`tipo_servicio_id`);
+
+--
+-- Indices de la tabla `tipo_servicio`
+--
+ALTER TABLE `tipo_servicio`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UK49qoy51a9qftp0y9bfgi2r5qm` (`nombre`);
+
+--
+-- Indices de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UKkfsp0s1tflm1cwlj8idhqsad0` (`email`),
+  ADD UNIQUE KEY `UKm2dvbwfge291euvmk6vkkocao` (`username`);
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+
+--
+-- AUTO_INCREMENT de la tabla `citas`
+--
+ALTER TABLE `citas`
+  MODIFY `id_cita` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `horario_semanal`
+--
+ALTER TABLE `horario_semanal`
+  MODIFY `id_horario_semana` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT de la tabla `servicio`
+--
+ALTER TABLE `servicio`
+  MODIFY `id_servicio` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+
+--
+-- AUTO_INCREMENT de la tabla `tipo_servicio`
+--
+ALTER TABLE `tipo_servicio`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `admin`
+--
+ALTER TABLE `admin`
+  ADD CONSTRAINT `FKhjrv95ryqymlav9uct846evsa` FOREIGN KEY (`id`) REFERENCES `usuarios` (`id`);
+
+--
+-- Filtros para la tabla `citas`
+--
+ALTER TABLE `citas`
+  ADD CONSTRAINT `FK7gieydedar8e8kbydi6xmx1s3` FOREIGN KEY (`id_grupo`) REFERENCES `grupo` (`id`),
+  ADD CONSTRAINT `FKa22phicdmngtdcj74aq926dsc` FOREIGN KEY (`id_servicio`) REFERENCES `servicio` (`id_servicio`),
+  ADD CONSTRAINT `FKif7nlo11p8nwqq4lhtgmmt5w3` FOREIGN KEY (`id_alumno`) REFERENCES `grupo` (`id`),
+  ADD CONSTRAINT `FKjkd00dq43rrhc7mse8pibn3d3` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id`);
+
+--
+-- Filtros para la tabla `cliente`
+--
+ALTER TABLE `cliente`
+  ADD CONSTRAINT `FKi00831t74lxfvnayicnwovcp5` FOREIGN KEY (`grupo_id`) REFERENCES `grupo` (`id`),
+  ADD CONSTRAINT `FKl80wv21oi0mn8x6awsn1nwy5j` FOREIGN KEY (`id`) REFERENCES `usuarios` (`id`);
+
+--
+-- Filtros para la tabla `grupo`
+--
+ALTER TABLE `grupo`
+  ADD CONSTRAINT `FK1jlverbe0cq18yyf84x3m39en` FOREIGN KEY (`id`) REFERENCES `usuarios` (`id`);
+
+--
+-- Filtros para la tabla `horario_semanal`
+--
+ALTER TABLE `horario_semanal`
+  ADD CONSTRAINT `FK4o3hudak4t9pxpwdgtrh2add0` FOREIGN KEY (`id_servicio`) REFERENCES `servicio` (`id_servicio`),
+  ADD CONSTRAINT `FKe3y9sudwf3w5vbgy8mphvcq96` FOREIGN KEY (`id_grupo`) REFERENCES `grupo` (`id`);
+
+--
+-- Filtros para la tabla `servicio`
+--
+ALTER TABLE `servicio`
+  ADD CONSTRAINT `FK5g48yc2sr5ecks0ay9leesuv2` FOREIGN KEY (`tipo_servicio_id`) REFERENCES `tipo_servicio` (`id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
