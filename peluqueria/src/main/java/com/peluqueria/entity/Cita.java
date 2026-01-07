@@ -33,11 +33,15 @@ public class Cita {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private HorarioSemanal horarioSemanal;
 
-
-
     public Cita() {}
 
-    // Getters y Setters
+
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    public Servicio getServicio() {
+        return (horarioSemanal != null) ? horarioSemanal.getServicio() : null;
+    }
+
+
     public Long getIdCita() { return idCita; }
     public void setIdCita(Long idCita) { this.idCita = idCita; }
 
@@ -61,9 +65,4 @@ public class Cita {
 
     public HorarioSemanal getHorarioSemanal() { return horarioSemanal; }
     public void setHorarioSemanal(HorarioSemanal horarioSemanal) { this.horarioSemanal = horarioSemanal; }
-
-    // Método auxiliar si quieres facilitar el acceso al servicio en el JSON de respuesta
-    public Servicio getServicio() {
-        return horarioSemanal != null ? horarioSemanal.getServicio() : null;
-    }
 }
