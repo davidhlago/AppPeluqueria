@@ -25,12 +25,14 @@ public class ServicioHorarioSemanalImpl implements ServicioHorarioSemanal {
 
     @Override
     public List<HorarioSemanal> obtenerPorGrupo(Long idGrupo) {
-        return horarioRepository.findByGrupoId(idGrupo);
+        // Asegúrate de que en tu repositorio el método se llame findByGrupo_Id
+        return horarioRepository.findByGrupo_Id(idGrupo);
     }
 
     @Override
     public List<HorarioSemanal> obtenerPorServicio(Long idServicio) {
-        return horarioRepository.findByServicioIdServicio(idServicio);
+        // Asegúrate de que en tu repositorio el método se llame findByServicio_IdServicio
+        return horarioRepository.findByServicio_IdServicio(idServicio);
     }
 
     @Override

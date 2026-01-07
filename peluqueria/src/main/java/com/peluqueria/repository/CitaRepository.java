@@ -13,35 +13,18 @@ import java.util.List;
 @Repository
 public interface CitaRepository extends JpaRepository<Cita, Long> {
 
-    List<Cita> findByClienteId(Long id);
-    List<Cita> findByGrupoId(Long id);
-    List<Cita> findByAlumnoId(Long id);
-
-    @Query("SELECT c FROM Cita c WHERE c.grupo.id = :grupoId " +
+    @Query("SELECT COUNT(c) FROM Cita c WHERE c.servicio.idServicio = :idServicio " +
             "AND c.fecha = :fecha " +
             "AND c.estado != 'CANCELADA' " +
-            "AND ((c.horaInicio < :horaFin) AND (c.horaFin > :horaInicio))")
-    List<Cita> encontrarCitasSolapadas(@Param("grupoId") Long grupoId,
-                                       @Param("fecha") LocalDate fecha,
-                                       @Param("horaInicio") LocalTime horaInicio,
-                                       @Param("horaFin") LocalTime horaFin);
+            "AND ( " +
+            "  (c.horaInicio < :fin AND c.horaFin > :inicio) " +
+            ")")
+    long countCitasConflictivas(@Param("idServicio") Long idServicio,
+                                @Param("fecha") LocalDate fecha,
+                                @Param("inicio") LocalTime inicio,
+                                @Param("fin") LocalTime fin);
 
-    @Query("SELECT c FROM Cita c WHERE c.grupo.id = :grupoId " +
-            "AND c.fecha = :fecha " +
-            "AND c.idCita != :citaId " +
-            "AND c.estado != 'CANCELADA' " +
-            "AND ((c.horaInicio < :horaFin) AND (c.horaFin > :horaInicio))")
-    List<Cita> encontrarCitasSolapadasEditar(@Param("grupoId") Long grupoId,
-                                             @Param("fecha") LocalDate fecha,
-                                             @Param("horaInicio") LocalTime horaInicio,
-                                             @Param("horaFin") LocalTime horaFin,
-                                             @Param("citaId") Long citaId);
+    List<Cita> findByCliente_Id(Long id);
 
-    @Query("SELECT COUNT(c) FROM Cita c WHERE c.grupo.id = :grupoId " +
-            "AND c.servicio.idServicio = :servicioId " +
-            "AND c.fecha = :fecha " +
-            "AND c.estado != 'CANCELADA'")
-    long contarCitasPorDia(@Param("grupoId") Long grupoId,
-                           @Param("servicioId") Long servicioId,
-                           @Param("fecha") LocalDate fecha);
+    List<Cita> findByGrupo_Id(Long id);
 }
