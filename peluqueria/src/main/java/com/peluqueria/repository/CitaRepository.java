@@ -13,18 +13,10 @@ import java.util.List;
 @Repository
 public interface CitaRepository extends JpaRepository<Cita, Long> {
 
-    @Query("SELECT COUNT(c) FROM Cita c WHERE c.servicio.idServicio = :idServicio " +
-            "AND c.fecha = :fecha " +
-            "AND c.estado != 'CANCELADA' " +
-            "AND ( " +
-            "  (c.horaInicio < :fin AND c.horaFin > :inicio) " +
-            ")")
-    long countCitasConflictivas(@Param("idServicio") Long idServicio,
-                                @Param("fecha") LocalDate fecha,
-                                @Param("inicio") LocalTime inicio,
-                                @Param("fin") LocalTime fin);
+    List<Cita> findByCliente_Id(Long idCliente);
+    List<Cita> findByGrupo_Id(Long idGrupo);
 
-    List<Cita> findByCliente_Id(Long id);
-
-    List<Cita> findByGrupo_Id(Long id);
+    // CAMBIO IMPORTANTE: Ahora filtramos por horarioSemanal.idHorarioSemana
+    @Query("SELECT COUNT(c) FROM Cita c WHERE c.horarioSemanal.idHorarioSemana = :idHorario AND c.fecha = :fecha AND c.estado <> 'CANCELADA' AND ((c.horaInicio < :horaFin AND c.horaFin > :horaInicio))")
+    long countCitasConflictivas(@Param("idHorario") Long idHorario, @Param("fecha") LocalDate fecha, @Param("horaInicio") LocalTime horaInicio, @Param("horaFin") LocalTime horaFin);
 }

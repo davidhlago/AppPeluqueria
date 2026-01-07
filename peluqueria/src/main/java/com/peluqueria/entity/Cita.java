@@ -1,7 +1,7 @@
 package com.peluqueria.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -18,23 +18,26 @@ public class Cita {
     private LocalTime horaFin;
     private String estado;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_servicio")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private Servicio servicio;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "id_cliente")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Cliente cliente;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "id_grupo")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Grupo grupo;
 
+    @ManyToOne
+    @JoinColumn(name = "id_horario_semana", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private HorarioSemanal horarioSemanal;
+
+
+
     public Cita() {}
 
+    // Getters y Setters
     public Long getIdCita() { return idCita; }
     public void setIdCita(Long idCita) { this.idCita = idCita; }
 
@@ -50,12 +53,17 @@ public class Cita {
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
 
-    public Servicio getServicio() { return servicio; }
-    public void setServicio(Servicio servicio) { this.servicio = servicio; }
-
     public Cliente getCliente() { return cliente; }
     public void setCliente(Cliente cliente) { this.cliente = cliente; }
 
     public Grupo getGrupo() { return grupo; }
     public void setGrupo(Grupo grupo) { this.grupo = grupo; }
+
+    public HorarioSemanal getHorarioSemanal() { return horarioSemanal; }
+    public void setHorarioSemanal(HorarioSemanal horarioSemanal) { this.horarioSemanal = horarioSemanal; }
+
+    // Método auxiliar si quieres facilitar el acceso al servicio en el JSON de respuesta
+    public Servicio getServicio() {
+        return horarioSemanal != null ? horarioSemanal.getServicio() : null;
+    }
 }

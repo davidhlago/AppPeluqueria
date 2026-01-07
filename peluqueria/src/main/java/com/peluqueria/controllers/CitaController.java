@@ -2,15 +2,14 @@ package com.peluqueria.controllers;
 
 import com.peluqueria.entity.Cita;
 import com.peluqueria.security.service.ServicioCita;
-import com.peluqueria.security.service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -19,67 +18,70 @@ import java.util.List;
 public class CitaController {
 
     @Autowired
-    private ServicioCita servicioCita;
+    private ServicioCita citaService;
 
-    // --- LISTAR CITAS (Según rol) ---
-    @GetMapping
+    @GetMapping("/todas")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
+    public ResponseEntity<List<Cita>> listarTodas() {
+        return ResponseEntity.ok(citaService.obtenerTodas());
+    }
+
+    @GetMapping("/cliente/{clienteId}")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
+    public ResponseEntity<List<Cita>> listarCitasCliente(@PathVariable Long clienteId) {
+        return ResponseEntity.ok(citaService.obtenerPorCliente(clienteId));
+    }
+
+    @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public List<Cita> listarCitas(Authentication authentication) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        String rol = userDetails.getAuthorities().iterator().next().getAuthority();
-
-        if ("ADMIN".equals(rol)) {
-            return servicioCita.obtenerTodas();
-        } else if ("GRUPO".equals(rol)) {
-            return servicioCita.obtenerPorGrupo(userDetails.getId());
-        } else {
-            return servicioCita.obtenerPorCliente(userDetails.getId());
-        }
-    }
-
-    // --- CREAR CITA ---
-    @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
-    public ResponseEntity<?> guardarCita(@RequestBody Cita cita) {
+    public ResponseEntity<Cita> getCitaById(@PathVariable long id) {
         try {
-            Cita nuevaCita = servicioCita.crearCita(cita);
-            return ResponseEntity.ok(nuevaCita);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    // --- EDITAR CITA (NUEVO) ---
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
-    public ResponseEntity<?> editarCita(@PathVariable Long id, @RequestBody Cita cita) {
-        try {
-            Cita citaEditada = servicioCita.modificarCita(id, cita);
-            return ResponseEntity.ok(citaEditada);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    // --- CANCELAR CITA ---
-    @PutMapping("/{id}/cancelar")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
-    public ResponseEntity<?> cancelar(@PathVariable Long id) {
-        servicioCita.cancelarCita(id);
-        return ResponseEntity.ok("Cita cancelada correctamente");
-    }
-
-    // --- VER HUECOS LIBRES ---
-    @GetMapping("/disponibilidad")
-    public ResponseEntity<?> verHuecos(@RequestParam String fecha,
-                                       @RequestParam Long servicioId,
-                                       @RequestParam Long grupoId) {
-        try {
-            LocalDate fechaL = LocalDate.parse(fecha);
-            List<LocalTime> huecos = servicioCita.obtenerHuecosDisponibles(fechaL, servicioId, grupoId);
-            return ResponseEntity.ok(huecos);
+            Cita cita = citaService.obtenerPorId(id);
+            return ResponseEntity.ok(cita);
         } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/disponible")
+    public ResponseEntity<?> getCitasDisponibles(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+            @RequestParam Long horarioId) {
+        return ResponseEntity.ok(citaService.obtenerHuecosDisponibles(fecha, horarioId, null));
+    }
+
+    @PostMapping("/reservar")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
+    public ResponseEntity<?> addCita(@RequestBody Cita cita) {
+        try {
+            Cita added = citaService.crearCita(cita);
+            return new ResponseEntity<>(added, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}/estado/{opcion}")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
+    public ResponseEntity<?> cambiarEstado(
+            @PathVariable long id,
+            @PathVariable int opcion) {
+        try {
+            Cita citaActualizada = citaService.gestionarEstadoCita(id, opcion);
+            return ResponseEntity.ok(citaActualizada);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
+    public ResponseEntity<Void> deleteCita(@PathVariable long id) {
+        try {
+            citaService.cancelarCita(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 }

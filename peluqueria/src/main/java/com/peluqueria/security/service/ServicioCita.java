@@ -7,12 +7,13 @@ import java.util.List;
 
 public interface ServicioCita {
     Cita crearCita(Cita cita);
-    Cita modificarCita(Long id, Cita citaDetalles); // Nuevo
-    List<Cita> obtenerTodas();
-    List<Cita> obtenerPorCliente(Long clienteId);
-    List<Cita> obtenerPorGrupo(Long grupoId);
-    List<Cita> obtenerPorAlumno(Long alumnoId);
-    Cita obtenerPorId(Long id);
+    Cita modificarCita(Long id, Cita cita);
+    Cita gestionarEstadoCita(Long id, int opcion);
     void cancelarCita(Long id);
-    List<LocalTime> obtenerHuecosDisponibles(LocalDate fecha, Long servicioId, Long grupoId);
+    List<Cita> obtenerTodas();
+    List<Cita> obtenerPorGrupo(Long id);
+    List<Cita> obtenerPorCliente(Long id);
+    List<Cita> obtenerPorAlumno(Long id);
+    Cita obtenerPorId(Long id);
+    List<LocalTime> obtenerHuecosDisponibles(LocalDate f, Long s, Long g);
 }

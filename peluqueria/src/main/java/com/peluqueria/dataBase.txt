@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 07-01-2026 a las 09:50:42
+-- Tiempo de generación: 07-01-2026 a las 13:30:43
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -57,8 +57,17 @@ CREATE TABLE `citas` (
   `hora_inicio` time(6) DEFAULT NULL,
   `id_cliente` bigint(20) DEFAULT NULL,
   `id_grupo` bigint(20) DEFAULT NULL,
-  `id_servicio` bigint(20) DEFAULT NULL
+  `id_horario_semana` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `citas`
+--
+
+INSERT INTO `citas` (`id_cita`, `estado`, `fecha`, `hora_fin`, `hora_inicio`, `id_cliente`, `id_grupo`, `id_horario_semana`) VALUES
+(3, 'PENDIENTE', '2026-01-21', '12:30:00.000000', '12:00:00.000000', 5, 9, 5),
+(4, 'PENDIENTE', '2026-01-21', '12:30:00.000000', '12:00:00.000000', 5, 9, 5),
+(5, 'PENDIENTE', '2026-01-21', '12:30:00.000000', '12:00:00.000000', 5, 9, 5);
 
 -- --------------------------------------------------------
 
@@ -134,12 +143,12 @@ CREATE TABLE `horario_semanal` (
 --
 
 INSERT INTO `horario_semanal` (`id_horario_semana`, `dias_semana`, `hora_fin`, `hora_inicio`, `id_grupo`, `id_servicio`, `cupo_maximo`) VALUES
-(1, 'Lunes', '10:30:00.000000', '08:50:00.000000', 9, 11, 2),
-(2, 'Lunes', '14:00:00.000000', '12:00:00.000000', 9, 11, 2),
-(3, 'Jueves', '10:30:00.000000', '08:50:00.000000', 9, 11, 2),
-(4, 'Jueves', '14:00:00.000000', '12:00:00.000000', 9, 11, 2),
-(5, 'Miércoles', '14:00:00.000000', '12:00:00.000000', 9, 11, 2),
-(6, 'Viernes', '09:40:00.000000', '08:00:00.000000', 9, 11, 2),
+(1, 'Lunes', '10:30:00.000000', '08:50:00.000000', 9, 11, 10),
+(2, 'Lunes', '14:00:00.000000', '12:00:00.000000', 9, 11, 10),
+(3, 'Jueves', '10:30:00.000000', '08:50:00.000000', 9, 11, 10),
+(4, 'Jueves', '14:00:00.000000', '12:00:00.000000', 9, 11, 10),
+(5, 'Miércoles', '14:00:00.000000', '12:00:00.000000', 9, 11, 10),
+(6, 'Viernes', '09:40:00.000000', '08:00:00.000000', 9, 11, 10),
 (7, 'Viernes', '14:00:00.000000', '11:05:00.000000', 9, 15, 2),
 (8, 'Lunes', '10:30:00.000000', '08:50:00.000000', 9, 12, 2),
 (9, 'Lunes', '14:00:00.000000', '12:00:00.000000', 9, 12, 2),
@@ -370,7 +379,7 @@ ALTER TABLE `citas`
   ADD PRIMARY KEY (`id_cita`),
   ADD KEY `FKjkd00dq43rrhc7mse8pibn3d3` (`id_cliente`),
   ADD KEY `FK7gieydedar8e8kbydi6xmx1s3` (`id_grupo`),
-  ADD KEY `FKa22phicdmngtdcj74aq926dsc` (`id_servicio`);
+  ADD KEY `FK_cita_horario_semanal` (`id_horario_semana`);
 
 --
 -- Indices de la tabla `cliente`
@@ -423,7 +432,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `citas`
 --
 ALTER TABLE `citas`
-  MODIFY `id_cita` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_cita` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `horario_semanal`
@@ -464,7 +473,7 @@ ALTER TABLE `admin`
 --
 ALTER TABLE `citas`
   ADD CONSTRAINT `FK7gieydedar8e8kbydi6xmx1s3` FOREIGN KEY (`id_grupo`) REFERENCES `grupo` (`id`),
-  ADD CONSTRAINT `FKa22phicdmngtdcj74aq926dsc` FOREIGN KEY (`id_servicio`) REFERENCES `servicio` (`id_servicio`),
+  ADD CONSTRAINT `FK_cita_horario_ref` FOREIGN KEY (`id_horario_semana`) REFERENCES `horario_semanal` (`id_horario_semana`),
   ADD CONSTRAINT `FKjkd00dq43rrhc7mse8pibn3d3` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id`);
 
 --
