@@ -39,4 +39,12 @@ public class HorarioSemanalController {
         servicioHorario.eliminarHorario(id);
         return ResponseEntity.ok("Horario eliminado");
     }
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public HorarioSemanal actualizar(@PathVariable Long id, @RequestBody HorarioSemanal horarioDetails) {
+        HorarioSemanal horario = servicioHorario.obtenerPorId(id);
+        horario.setCupoMaximo(horarioDetails.getCupoMaximo());
+        horario.setDiasSemana(horarioDetails.getDiasSemana());
+        return servicioHorario.guardarHorario(horario);
+    }
 }

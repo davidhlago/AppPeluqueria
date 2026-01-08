@@ -9,5 +9,8 @@ public interface ServicioHorarioSemanal {
     List<HorarioSemanal> obtenerPorGrupo(Long idGrupo);
     List<HorarioSemanal> obtenerPorServicio(Long idServicio);
     void eliminarHorario(Long id);
+
+    HorarioSemanal actualizarHorario(Long id, HorarioSemanal datosNuevos);
+
     HorarioSemanal obtenerPorId(Long id);
 }

@@ -27,19 +27,36 @@ public class ServicioHorarioSemanalImpl implements ServicioHorarioSemanal {
 
     @Override
     public List<HorarioSemanal> obtenerTodos() {
-        return horarioRepository.findAll();
+        // Cambiamos findAll() por nuestro nuevo método optimizado
+        return horarioRepository.findAllOptimized();
     }
 
     @Override
     public List<HorarioSemanal> obtenerPorGrupo(Long idGrupo) {
-        return horarioRepository.findByGrupo_Id(idGrupo);
+        return horarioRepository.findByGrupo_IdOptimized(idGrupo);
     }
-
     @Override
     public List<HorarioSemanal> obtenerPorServicio(Long idServicio) {
-        return horarioRepository.findByServicio_IdServicio(idServicio);
+        // Cambia el nombre al que acabamos de crear en el repository
+        return horarioRepository.findByServicio_IdServicioOptimized(idServicio);
     }
 
+    // En ServicioHorarioSemanalImpl.java
+    @Override
+    public HorarioSemanal actualizarHorario(Long id, HorarioSemanal datosNuevos) {
+        HorarioSemanal existente = horarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
+
+        existente.setCupoMaximo(datosNuevos.getCupoMaximo());
+        existente.setDiasSemana(datosNuevos.getDiasSemana());
+        existente.setHoraInicio(datosNuevos.getHoraInicio());
+        existente.setHoraFin(datosNuevos.getHoraFin());
+        // Mantenemos el servicio y grupo originales o los actualizamos si vienen en el body
+        if(datosNuevos.getServicio() != null) existente.setServicio(datosNuevos.getServicio());
+        if(datosNuevos.getGrupo() != null) existente.setGrupo(datosNuevos.getGrupo());
+
+        return horarioRepository.save(existente);
+    }
     @Override
     public HorarioSemanal obtenerPorId(Long id) {
         return horarioRepository.findById(id)
@@ -53,4 +70,5 @@ public class ServicioHorarioSemanalImpl implements ServicioHorarioSemanal {
         }
         horarioRepository.deleteById(id);
     }
+
 }
