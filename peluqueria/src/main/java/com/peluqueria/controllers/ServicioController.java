@@ -15,13 +15,11 @@ public class ServicioController {
     @Autowired
     private ServicioService servicioService;
 
-
     @GetMapping
     public ResponseEntity<List<Servicio>> listarServicios() {
         List<Servicio> servicios = servicioService.findAll();
         return servicios.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(servicios);
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<Servicio> obtenerServicio(@PathVariable Long id) {
@@ -29,22 +27,30 @@ public class ServicioController {
         return (servicio != null) ? ResponseEntity.ok(servicio) : ResponseEntity.notFound().build();
     }
 
-
     @PostMapping
     public ResponseEntity<Servicio> crearServicio(@RequestBody Servicio servicio) {
         Servicio nuevo = servicioService.save(servicio);
         return ResponseEntity.status(201).body(nuevo);
     }
 
-
     @PutMapping("/{id}")
-    public ResponseEntity<Servicio> actualizarServicio(@PathVariable Long id, @RequestBody Servicio servicio) {
+    public ResponseEntity<Servicio> actualizarServicio(@PathVariable Long id, @RequestBody Servicio servicioDetalles) {
         Servicio existente = servicioService.findById(id);
         if (existente == null) {
             return ResponseEntity.notFound().build();
         }
-        servicio.setIdServicio(id);
-        Servicio actualizado = servicioService.save(servicio);
+
+        existente.setNombre(servicioDetalles.getNombre());
+        existente.setDescripcion(servicioDetalles.getDescripcion());
+        existente.setDuracionBloques(servicioDetalles.getDuracionBloques());
+        existente.setPrecio(servicioDetalles.getPrecio());
+        existente.setTipoServicio(servicioDetalles.getTipoServicio());
+
+        if (servicioDetalles.getImagenBase64() != null && !servicioDetalles.getImagenBase64().isEmpty()) {
+            existente.setImagenBase64(servicioDetalles.getImagenBase64());
+        }
+
+        Servicio actualizado = servicioService.save(existente);
         return ResponseEntity.ok(actualizado);
     }
 
@@ -69,6 +75,4 @@ public class ServicioController {
         List<Servicio> resultados = servicioService.buscarPorDuracionMinimaNativa(duracion);
         return resultados.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(resultados);
     }
-
-
 }

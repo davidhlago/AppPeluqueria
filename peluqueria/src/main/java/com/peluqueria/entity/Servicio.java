@@ -28,28 +28,21 @@ public class Servicio {
     @Column(nullable = false)
     private double precio;
 
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    private String imagenBase64;
+
     public Servicio() {
     }
 
-    public Servicio(Long idServicio, TipoServicio tipoServicio, String nombre, String descripcion, int duracionBloques, double precio) {
+    public Servicio(Long idServicio, TipoServicio tipoServicio, String nombre, String descripcion, int duracionBloques, double precio, String imagenBase64) {
         this.idServicio = idServicio;
         this.tipoServicio = tipoServicio;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.duracionBloques = duracionBloques;
         this.precio = precio;
-    }
-
-    public TipoServicio getTipoServicio() {
-        return tipoServicio;
-    }
-
-    public void setTipoServicio(TipoServicio tipoServicio) {
-        this.tipoServicio = tipoServicio;
-    }
-
-    public int getDuracionBloques() {
-        return duracionBloques;
+        this.imagenBase64 = imagenBase64;
     }
 
     public Long getIdServicio() {
@@ -60,16 +53,20 @@ public class Servicio {
         this.idServicio = idServicio;
     }
 
+    public TipoServicio getTipoServicio() {
+        return tipoServicio;
+    }
+
+    public void setTipoServicio(TipoServicio tipoServicio) {
+        this.tipoServicio = tipoServicio;
+    }
+
     public String getNombre() {
         return nombre;
     }
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    public void setDuracionBloques(int duracionBloques) {
-        this.duracionBloques = duracionBloques;
     }
 
     public String getDescripcion() {
@@ -80,12 +77,28 @@ public class Servicio {
         this.descripcion = descripcion;
     }
 
+    public int getDuracionBloques() {
+        return duracionBloques;
+    }
+
+    public void setDuracionBloques(int duracionBloques) {
+        this.duracionBloques = duracionBloques;
+    }
+
     public double getPrecio() {
         return precio;
     }
 
     public void setPrecio(double precio) {
         this.precio = precio;
+    }
+
+    public String getImagenBase64() {
+        return imagenBase64;
+    }
+
+    public void setImagenBase64(String imagenBase64) {
+        this.imagenBase64 = imagenBase64;
     }
 
     @Override
