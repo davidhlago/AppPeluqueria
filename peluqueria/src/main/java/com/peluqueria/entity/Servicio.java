@@ -2,6 +2,7 @@ package com.peluqueria.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "servicio")
@@ -45,13 +46,11 @@ public class Servicio {
         this.imagenBase64 = imagenBase64;
     }
 
-    public Long getIdServicio() {
-        return idServicio;
-    }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    public void setIdServicio(Long idServicio) {
-        this.idServicio = idServicio;
-    }
+    public int getDuracionBloques() { return duracionBloques; }
+    public void setDuracionBloques(int duracionBloques) { this.duracionBloques = duracionBloques; }
 
     public TipoServicio getTipoServicio() {
         return tipoServicio;
@@ -110,6 +109,7 @@ public class Servicio {
                 ", descripcion='" + descripcion + '\'' +
                 ", duracionBloques=" + duracionBloques +
                 ", precio=" + precio +
+                ", tipoServicioId=" + tipoServicioId +
                 '}';
     }
 }
