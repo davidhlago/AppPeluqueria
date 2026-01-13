@@ -46,11 +46,6 @@ public class Servicio {
         this.imagenBase64 = imagenBase64;
     }
 
-    public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
-
-    public int getDuracionBloques() { return duracionBloques; }
-    public void setDuracionBloques(int duracionBloques) { this.duracionBloques = duracionBloques; }
 
     public TipoServicio getTipoServicio() {
         return tipoServicio;
@@ -109,7 +104,7 @@ public class Servicio {
                 ", descripcion='" + descripcion + '\'' +
                 ", duracionBloques=" + duracionBloques +
                 ", precio=" + precio +
-                ", tipoServicioId=" + tipoServicioId +
+                ", tipoServicioId=" + tipoServicio +
                 '}';
     }
 }
