@@ -12,6 +12,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     Usuario findByUsername(String username);
 
+    // Solo declaramos el método, sin lógica interna
     Usuario findByEmail(String email);
 
     List<Usuario> findByUsernameContainingIgnoreCase(String texto);

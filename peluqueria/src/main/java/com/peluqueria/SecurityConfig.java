@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/test/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/auth/google", "/api/test/**").permitAll()
                         // PERMITIR GET PÚBLICO A HORARIOS
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/horarios-semanales/**").permitAll()
 
