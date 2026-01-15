@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/servicios")
+// CORRECCIÓN AQUÍ: Añadimos "/api" para que coincida con SecurityConfig
+@RequestMapping("/api/servicios")
 public class ServicioController {
 
     @Autowired

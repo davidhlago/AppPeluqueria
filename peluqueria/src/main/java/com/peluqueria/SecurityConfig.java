@@ -54,7 +54,7 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/test/**").permitAll()
-                        // PERMITIR GET PÚBLICO A HORARIOS
+                        .requestMatchers("/api/servicios/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/horarios-semanales/**").permitAll()
 
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
