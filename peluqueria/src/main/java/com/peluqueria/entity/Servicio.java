@@ -46,7 +46,13 @@ public class Servicio {
         this.imagenBase64 = imagenBase64;
     }
 
+    public Long getIdServicio() {
+        return idServicio;
+    }
 
+    public void setIdServicio(Long idServicio) {
+        this.idServicio = idServicio;
+    }
     public TipoServicio getTipoServicio() {
         return tipoServicio;
     }

@@ -27,4 +27,8 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             @Param("horaInicio") LocalTime horaInicio,
             @Param("horaFin") LocalTime horaFin
     );
+    @Query("SELECT COUNT(c) FROM Cita c WHERE c.horarioSemanal.idHorarioSemana = :idHorario AND c.fecha = :fecha AND c.horaInicio = :horaInicio AND c.estado != 'CANCELADA'")
+
+    int contarCitas(@Param("idHorario") Long idHorario, @Param("fecha") LocalDate fecha, @Param("horaInicio") LocalTime horaInicio);
+
 }

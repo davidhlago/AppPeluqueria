@@ -11,12 +11,13 @@ import com.peluqueria.repository.ClienteRepository;
 import com.peluqueria.repository.HorarioSemanalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ServicioCitaImpl implements ServicioCita {
@@ -122,7 +123,46 @@ public class ServicioCitaImpl implements ServicioCita {
         return huecosLibres;
     }
 
-    // ... Resto de métodos (modificar, gestionarEstado, etc.) ...
+    @Override
+    @Transactional(readOnly = true) // <--- ESTO ES VITAL para evitar errores de base de datos
+    public List<Map<String, Object>> obtenerHuecosPorServicioYFecha(Long idServicio, LocalDate fecha) {
+        // 1. Traducir el día
+        String diaEspanol = traducirDia(fecha.getDayOfWeek());
+
+        // 2. Buscar horario usando la NUEVA consulta segura
+        List<HorarioSemanal> horarios = horarioRepository.buscarPorServicioYDia(idServicio, diaEspanol);
+
+        List<Map<String, Object>> huecosDisponibles = new ArrayList<>();
+
+        for (HorarioSemanal horario : horarios) {
+            Servicio servicio = horario.getServicio();
+
+            // Validación extra por seguridad
+            if (servicio == null) continue;
+
+            int duracionMinutos = (servicio.getDuracionBloques() > 0)
+                    ? servicio.getDuracionBloques() * MINUTOS_POR_BLOQUE
+                    : MINUTOS_POR_BLOQUE;
+
+            LocalTime horaActual = horario.getHoraInicio();
+            LocalTime horaFinTurno = horario.getHoraFin();
+
+            while (!horaActual.plusMinutes(duracionMinutos).isAfter(horaFinTurno)) {
+                LocalTime finBloque = horaActual.plusMinutes(duracionMinutos);
+
+                long conflictos = citaRepository.countCitasConflictivas(horario, fecha, horaActual, finBloque);
+
+                if (conflictos < horario.getCupoMaximo()) {
+                    huecosDisponibles.add(Map.of(
+                            "hora", horaActual.toString(),
+                            "idHorario", horario.getIdHorarioSemana()
+                    ));
+                }
+                horaActual = horaActual.plusMinutes(MINUTOS_POR_BLOQUE);
+            }
+        }
+        return huecosDisponibles;
+    }
 
     @Override
     public Cita modificarCita(Long id, Cita citaDetalles) {
@@ -156,6 +196,7 @@ public class ServicioCitaImpl implements ServicioCita {
     public List<Cita> obtenerPorGrupo(Long id) { return citaRepository.findByGrupo_Id(id); }
     @Override
     public List<Cita> obtenerPorAlumno(Long id) { return new ArrayList<>(); }
+
 
     private String traducirDia(DayOfWeek dia) {
         switch (dia) {
