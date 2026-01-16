@@ -47,11 +47,13 @@ public class CitaController {
         }
     }
 
-    @GetMapping("/disponible")
-    public ResponseEntity<?> getCitasDisponibles(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
-            @RequestParam Long horarioId) {
-        return ResponseEntity.ok(citaService.obtenerHuecosDisponibles(fecha, horarioId, null));
+    @GetMapping("/huecos")
+    public ResponseEntity<?> getHuecosPorServicio(
+            @RequestParam(name = "fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+            @RequestParam(name = "idServicio") Long idServicio) {
+
+        // Llamamos al método "blindado" que arreglamos antes en el servicio
+        return ResponseEntity.ok(citaService.obtenerHuecosPorServicioYFecha(idServicio, fecha));
     }
 
     // --- Métodos que lanzan excepciones de negocio ---
