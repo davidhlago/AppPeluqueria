@@ -22,7 +22,7 @@ public class CitaController {
     @Autowired
     private ServicioCita citaService;
 
-    // Métodos de lectura (GET) - Generalmente seguros, pero podemos capturar si ID no existe
+    // --- MÉTODOS DE LECTURA ---
 
     @GetMapping("/todas")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
@@ -51,12 +51,10 @@ public class CitaController {
     public ResponseEntity<?> getHuecosPorServicio(
             @RequestParam(name = "fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
             @RequestParam(name = "idServicio") Long idServicio) {
-
-        // Llamamos al método "blindado" que arreglamos antes en el servicio
         return ResponseEntity.ok(citaService.obtenerHuecosPorServicioYFecha(idServicio, fecha));
     }
 
-    // --- Métodos que lanzan excepciones de negocio ---
+    // --- MÉTODOS DE ESCRITURA (POST/PUT/DELETE) ---
 
     @PostMapping("/reservar")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
@@ -65,19 +63,27 @@ public class CitaController {
             Cita added = citaService.crearCita(cita);
             return new ResponseEntity<>(added, HttpStatus.CREATED);
         } catch (HorarioException | CitaException e) {
-            // Error controlado (400 Bad Request)
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            // Error inesperado (500 Internal Server Error)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno: " + e.getMessage());
+        }
+    }
+
+    // ✅ MÉTODO ESPECÍFICO PARA CANCELAR DESDE LA APP (PUT)
+    @PutMapping("/{id}/cancelar")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
+    public ResponseEntity<?> cancelarCitaPorCliente(@PathVariable Long id) {
+        try {
+            citaService.cancelarCita(id);
+            return ResponseEntity.ok("{\"mensaje\": \"Cita cancelada correctamente\"}");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("No se pudo cancelar: " + e.getMessage());
         }
     }
 
     @PutMapping("/{id}/estado/{opcion}")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
-    public ResponseEntity<?> cambiarEstado(
-            @PathVariable long id,
-            @PathVariable int opcion) {
+    public ResponseEntity<?> cambiarEstado(@PathVariable long id, @PathVariable int opcion) {
         try {
             Cita citaActualizada = citaService.gestionarEstadoCita(id, opcion);
             return ResponseEntity.ok(citaActualizada);
@@ -90,9 +96,7 @@ public class CitaController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
-    public ResponseEntity<?> editarCita(
-            @PathVariable Long id,
-            @RequestBody Cita cita) {
+    public ResponseEntity<?> editarCita(@PathVariable Long id, @RequestBody Cita cita) {
         try {
             Cita citaEditada = citaService.modificarCita(id, cita);
             return ResponseEntity.ok(citaEditada);
