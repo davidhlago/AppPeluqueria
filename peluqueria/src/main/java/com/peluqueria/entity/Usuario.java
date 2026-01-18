@@ -24,7 +24,6 @@ public class Usuario {
     private String password;
     private String rol;
 
-    // 👇👇👇 NUEVO CAMPO PARA EL CÓDIGO DE RECUPERACIÓN 👇👇👇
     @Column(name = "reset_token")
     private String resetToken;
 
@@ -42,7 +41,6 @@ public class Usuario {
         this(nombre, apellidos, username, email, password);
         this.rol = rol;
     }
-
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -65,7 +63,6 @@ public class Usuario {
     public String getRol() { return rol; }
     public void setRol(String rol) { this.rol = rol; }
 
-    // 👇👇👇 NUEVOS GETTERS Y SETTERS 👇👇👇
     public String getResetToken() {
         return resetToken;
     }
