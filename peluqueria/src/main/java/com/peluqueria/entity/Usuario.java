@@ -24,6 +24,9 @@ public class Usuario {
     private String password;
     private String rol;
 
+    @Column(name = "reset_token")
+    private String resetToken;
+
     public Usuario() {}
 
     public Usuario(String nombre, String apellidos, String username, String email, String password) {
@@ -38,7 +41,6 @@ public class Usuario {
         this(nombre, apellidos, username, email, password);
         this.rol = rol;
     }
-
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -60,4 +62,12 @@ public class Usuario {
 
     public String getRol() { return rol; }
     public void setRol(String rol) { this.rol = rol; }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
 }

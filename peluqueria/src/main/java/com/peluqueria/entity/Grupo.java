@@ -1,10 +1,12 @@
 package com.peluqueria.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.DiscriminatorValue;
 
 @Entity
 @DiscriminatorValue("GRUPO")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Grupo extends Usuario {
 
     private String curso;
