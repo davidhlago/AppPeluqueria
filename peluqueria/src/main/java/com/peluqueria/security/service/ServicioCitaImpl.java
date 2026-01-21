@@ -12,6 +12,7 @@ import com.peluqueria.repository.HorarioSemanalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -34,7 +35,6 @@ public class ServicioCitaImpl implements ServicioCita {
 
     @Override
     public Cita crearCita(Cita citaIncoming) {
-        // 1. Validaciones básicas (IDs existen)
         if (citaIncoming.getHorarioSemanal() == null || citaIncoming.getHorarioSemanal().getIdHorarioSemana() == null) {
             throw new HorarioException("Debe especificar el ID del horario semanal");
         }
@@ -47,39 +47,31 @@ public class ServicioCitaImpl implements ServicioCita {
         Cliente cliente = clienteRepository.findById(citaIncoming.getCliente().getId())
                 .orElseThrow(() -> new CitaException("Cliente no encontrado"));
 
-        // 2. Validar que la fecha coincida con el día del horario (Lunes, Martes...)
         String diaSemanaFecha = traducirDia(citaIncoming.getFecha().getDayOfWeek());
         if (!diaSemanaFecha.equalsIgnoreCase(horario.getDiasSemana())) {
             throw new HorarioException("La fecha no coincide con el día del horario (" + horario.getDiasSemana() + ")");
         }
 
-        // 3. CALCULAR LOS BLOQUES QUE SE VAN A GASTAR
         Servicio servicio = horario.getServicio();
         LocalTime inicioSolicitado = citaIncoming.getHoraInicio();
-        if(inicioSolicitado == null) throw new CitaException("Debe indicar hora de inicio");
+        if (inicioSolicitado == null) throw new CitaException("Debe indicar hora de inicio");
 
-        // Aquí multiplicamos los bloques del servicio por 15 minutos.
-        // Ejemplo: Si el servicio son 4 bloques -> 4 * 15 = 60 minutos ocupados.
-        int duracionMinutos = (servicio.getDuracionBloques() > 0) ? servicio.getDuracionBloques() * MINUTOS_POR_BLOQUE : MINUTOS_POR_BLOQUE;
+        int duracionMinutos = (servicio.getDuracionBloques() > 0)
+                ? servicio.getDuracionBloques() * MINUTOS_POR_BLOQUE
+                : MINUTOS_POR_BLOQUE;
 
         LocalTime finSolicitado = inicioSolicitado.plusMinutes(duracionMinutos);
 
-        // 4. Validar que la cita entera cabe dentro del turno (ej. no termina a las 14:15 si cierran a las 14:00)
         if (inicioSolicitado.isBefore(horario.getHoraInicio()) || finSolicitado.isAfter(horario.getHoraFin())) {
             throw new HorarioException("La hora seleccionada está fuera del turno del horario.");
         }
 
-        // 5. VALIDACIÓN DE CUPO (Aquí es donde se 'restan' los bloques)
-        // Esta consulta cuenta cuántas personas tienen YA ocupado ESE rango de tiempo.
         long citasSimultaneas = citaRepository.countCitasConflictivas(horario, citaIncoming.getFecha(), inicioSolicitado, finSolicitado);
 
-        // Si cupoMaximo es 2, y citasSimultaneas ya es 2, significa que no quedan bloques libres para ti.
         if (citasSimultaneas >= horario.getCupoMaximo()) {
             throw new CitaException("No hay hueco disponible. El cupo está completo para ese tramo horario.");
         }
 
-        // 6. Si pasa la validación, GUARDAMOS.
-        // Al guardar, estos bloques quedan automáticamente "restados" para la siguiente persona que pregunte.
         citaIncoming.setCliente(cliente);
         citaIncoming.setHoraFin(finSolicitado);
         citaIncoming.setGrupo(horario.getGrupo());
@@ -100,17 +92,17 @@ public class ServicioCitaImpl implements ServicioCita {
         }
 
         Servicio servicio = horario.getServicio();
-        int duracionMinutos = (servicio.getDuracionBloques() > 0) ? servicio.getDuracionBloques() * MINUTOS_POR_BLOQUE : MINUTOS_POR_BLOQUE;
+        int duracionMinutos = (servicio.getDuracionBloques() > 0)
+                ? servicio.getDuracionBloques() * MINUTOS_POR_BLOQUE
+                : MINUTOS_POR_BLOQUE;
 
         List<LocalTime> huecosLibres = new ArrayList<>();
         LocalTime horaActual = horario.getHoraInicio();
         LocalTime horaFinTurno = horario.getHoraFin();
 
-        // Recorremos el horario cada 15 minutos para ver dónde caben los bloques del servicio
         while (!horaActual.plusMinutes(duracionMinutos).isAfter(horaFinTurno)) {
             LocalTime finBloque = horaActual.plusMinutes(duracionMinutos);
 
-            // Verificamos si los bloques necesarios están libres
             long conflictos = citaRepository.countCitasConflictivas(horario, fecha, horaActual, finBloque);
 
             if (conflictos < horario.getCupoMaximo()) {
@@ -124,20 +116,15 @@ public class ServicioCitaImpl implements ServicioCita {
     }
 
     @Override
-    @Transactional(readOnly = true) // <--- ESTO ES VITAL para evitar errores de base de datos
+    @Transactional(readOnly = true)
     public List<Map<String, Object>> obtenerHuecosPorServicioYFecha(Long idServicio, LocalDate fecha) {
-        // 1. Traducir el día
         String diaEspanol = traducirDia(fecha.getDayOfWeek());
 
-        // 2. Buscar horario usando la NUEVA consulta segura
-        List<HorarioSemanal> horarios = horarioRepository.buscarPorServicioYDia(idServicio, diaEspanol);
-
+        var horarios = horarioRepository.buscarPorServicioYDia(idServicio, diaEspanol);
         List<Map<String, Object>> huecosDisponibles = new ArrayList<>();
 
         for (HorarioSemanal horario : horarios) {
             Servicio servicio = horario.getServicio();
-
-            // Validación extra por seguridad
             if (servicio == null) continue;
 
             int duracionMinutos = (servicio.getDuracionBloques() > 0)
@@ -153,11 +140,15 @@ public class ServicioCitaImpl implements ServicioCita {
                 long conflictos = citaRepository.countCitasConflictivas(horario, fecha, horaActual, finBloque);
 
                 if (conflictos < horario.getCupoMaximo()) {
+                    int plazasRestantes = (int) (horario.getCupoMaximo() - conflictos);
+
                     huecosDisponibles.add(Map.of(
                             "hora", horaActual.toString(),
-                            "idHorario", horario.getIdHorarioSemana()
+                            "idHorario", horario.getIdHorarioSemana(),
+                            "plazasRestantes", plazasRestantes
                     ));
                 }
+
                 horaActual = horaActual.plusMinutes(MINUTOS_POR_BLOQUE);
             }
         }
@@ -174,8 +165,8 @@ public class ServicioCitaImpl implements ServicioCita {
     @Override
     public Cita gestionarEstadoCita(Long idCita, int opcion) {
         Cita cita = obtenerPorId(idCita);
-        if(opcion == 0) cita.setEstado("CONFIRMADA");
-        else if(opcion == 1) cita.setEstado("CANCELADA");
+        if (opcion == 0) cita.setEstado("CONFIRMADA");
+        else if (opcion == 1) cita.setEstado("CANCELADA");
         else throw new CitaException("Estado no válido");
         return citaRepository.save(cita);
     }
@@ -190,13 +181,15 @@ public class ServicioCitaImpl implements ServicioCita {
 
     @Override
     public List<Cita> obtenerTodas() { return citaRepository.findAll(); }
+
     @Override
     public List<Cita> obtenerPorCliente(Long id) { return citaRepository.findByCliente_Id(id); }
+
     @Override
     public List<Cita> obtenerPorGrupo(Long id) { return citaRepository.findByGrupo_Id(id); }
+
     @Override
     public List<Cita> obtenerPorAlumno(Long id) { return new ArrayList<>(); }
-
 
     private String traducirDia(DayOfWeek dia) {
         switch (dia) {

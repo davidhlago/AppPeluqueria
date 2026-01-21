@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 16-01-2026 a las 21:14:36
+-- Tiempo de generación: 21-01-2026 a las 12:15:40
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -73,7 +73,7 @@ INSERT INTO `citas` (`id_cita`, `estado`, `fecha`, `hora_fin`, `hora_inicio`, `i
 (8, 'PENDIENTE', '2026-01-21', '12:30:00.000000', '12:00:00.000000', 5, 9, 5),
 (9, 'CONFIRMADA', '2026-01-14', '12:30:00.000000', '12:00:00.000000', 5, 9, 5),
 (10, 'PENDIENTE', '2026-01-14', '12:30:00.000000', '12:00:00.000000', 5, 9, 5),
-(11, 'CONFIRMADA', '2026-01-19', '15:30:00.000000', '15:00:00.000000', 6, 10, 21),
+(11, 'CANCELADA', '2026-01-19', '15:30:00.000000', '15:00:00.000000', 6, 10, 21),
 (12, 'CONFIRMADA', '2026-01-19', '15:30:00.000000', '15:00:00.000000', 6, 10, 21),
 (13, 'CONFIRMADA', '2026-01-22', '11:50:00.000000', '11:20:00.000000', 6, 9, 20),
 (14, 'CONFIRMADA', '2026-01-22', '11:50:00.000000', '11:20:00.000000', 6, 9, 20),
@@ -358,33 +358,59 @@ CREATE TABLE `usuarios` (
   `nombre` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
   `rol` varchar(255) DEFAULT NULL,
-  `username` varchar(255) DEFAULT NULL
+  `username` varchar(255) DEFAULT NULL,
+  `reset_token` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`tipo_usuario`, `id`, `apellidos`, `email`, `nombre`, `password`, `rol`, `username`) VALUES
-('ADMIN', 2, 'Gomez_nuevo', 'laura.admin@peluqueria.com', 'Laura_nuevo', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'ADMIN', 'admin_laura_nuevo'),
-('ADMIN', 3, 'Martinez', 'david.admin@peluqueria.com', 'David', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'ADMIN', 'admin_david'),
-('ADMIN', 4, 'Vazquez', 'elena.admin@peluqueria.com', 'Elena', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'ADMIN', 'admin_elena'),
-('CLIENTE', 5, 'Torres', 'ana.torres@gmail.com', 'Ana', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'CLIENTE', 'cliente_ana'),
-('CLIENTE', 6, 'Ruiz', 'javier.ruiz@hotmail.com', 'Javier', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'CLIENTE', 'cliente_javi'),
-('CLIENTE', 7, 'López', 'sofia.lopez@yahoo.com', 'Sofia', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'CLIENTE', 'cliente_sofia'),
-('CLIENTE', 8, 'Angel', 'miguel.angel@outlook.com', 'Miguel', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'CLIENTE', 'cliente_miguel'),
-('GRUPO', 9, '1A', 'grupo.1a@escuela.com', 'Clase', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'GRUPO', 'grupo_1a'),
-('GRUPO', 10, '1B', 'grupo.1b@escuela.com', 'Clase', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'GRUPO', 'grupo_1b'),
-('GRUPO', 11, '2A', 'grupo.2a@escuela.com', 'Clase', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'GRUPO', 'grupo_2a'),
-('ADMIN', 12, 'Díaz', 'marta.admin@peluqueria.com', 'Marta', '$2a$10$ImBVoCUn./e9h6NbD1VWzOgdP0OQhWqAJBUEg6AySS4rOMmJhO.US', 'ADMIN', 'admin_marta'),
-('CLIENTE', 13, 'Méndez', 'lucia@email.com', 'Lucía', '$2a$10$o9XPgXyi3Adp6WUtBJ7dx.iEkoORndupKh0qzGOMedp3FZa/WjGYW', 'CLIENTE', 'lucia.user'),
-('CLIENTE', 14, 'Vargas', 'elena@email.com', 'Elena', '$2a$10$gNN3BfYXbDdPLMxB9jytdunvo9fUhZCy0PSgECTrYejL77Cm/rsGK', 'CLIENTE', 'elena.vargas'),
-('CLIENTE', 15, 'lamichhane', 'suman@gmail.com', 'suman', '$2a$10$tEjfk/g9OtUoh1tHvqWGIeMRPRIdiEErB/opn8CEJMcAQZPtSIOsy', 'CLIENTE', 'cliente_suman'),
-('ADMIN', 16, 'Apellidos...', 'davidaa.admin@peluqueria.com', 'aa', '$2a$10$Jyg6uOGkIZhn4HHRrSLrqu8YX.m2WoSCKEHm/omBHYtWFHyG8ZpnO', 'ADMIN', 'a'),
-('CLIENTE', 17, 'lamichhane', 'lamichhanesuman79@gmail.com', 'suman', '$2a$10$RmB1pwDTVkDjitHt0otyiO5Oqf2ZGsirhSsKXiIuPw4tyZR7VRhI.', 'CLIENTE', 'sumlan'),
-('CLIENTE', 18, 'lula', 'lulelala@test.com', 'lale', '$2a$10$1Dd2PUO3MKaCVRWuILaooOQJ6G/FKzylPGjCFviH4PiqQH5UKofq.', 'CLIENTE', 'cliente_lale'),
-('CLIENTE', 19, 'xata', 'okxata@gmail.com', 'ok', '$2a$10$yt58DpTGQU3WRh37Oya3sur6gfTA2d7KNgj0lN7hv77uqLR.yh1VC', 'CLIENTE', 'cliente_ok'),
-('CLIENTE', 20, 'shyam', 'ramshyam@gmail.com', 'ram', '$2a$10$n2sLYmelOY0vRloXr8YVS.Amj1nEYurqRE9xCvQhHoh3tWHbdBaj.', 'CLIENTE', 'cliente_ram');
+INSERT INTO `usuarios` (`tipo_usuario`, `id`, `apellidos`, `email`, `nombre`, `password`, `rol`, `username`, `reset_token`) VALUES
+('ADMIN', 2, 'Gomez_nuevo', 'laura.admin@peluqueria.com', 'Laura_nuevo', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'ADMIN', 'admin_laura_nuevo', NULL),
+('ADMIN', 3, 'Martinez', 'david.admin@peluqueria.com', 'David', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'ADMIN', 'admin_david', NULL),
+('ADMIN', 4, 'Vazquez', 'elena.admin@peluqueria.com', 'Elena', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'ADMIN', 'admin_elena', NULL),
+('CLIENTE', 5, 'Torres', 'ana.torres@gmail.com', 'Ana', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'CLIENTE', 'cliente_ana', NULL),
+('CLIENTE', 6, 'Ruiz', 'javier.ruiz@hotmail.com', 'Javier', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'CLIENTE', 'cliente_javi', NULL),
+('CLIENTE', 7, 'López', 'sofia.lopez@yahoo.com', 'Sofia', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'CLIENTE', 'cliente_sofia', NULL),
+('CLIENTE', 8, 'Angel', 'miguel.angel@outlook.com', 'Miguel', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'CLIENTE', 'cliente_miguel', NULL),
+('GRUPO', 9, '1A', 'grupo.1a@escuela.com', 'Clase', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'GRUPO', 'grupo_1a', NULL),
+('GRUPO', 10, '1B', 'grupo.1b@escuela.com', 'Clase', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'GRUPO', 'grupo_1b', NULL),
+('GRUPO', 11, '2A', 'grupo.2a@escuela.com', 'Clase', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', 'GRUPO', 'grupo_2a', NULL),
+('ADMIN', 12, 'Díaz', 'marta.admin@peluqueria.com', 'Marta', '$2a$10$ImBVoCUn./e9h6NbD1VWzOgdP0OQhWqAJBUEg6AySS4rOMmJhO.US', 'ADMIN', 'admin_marta', NULL),
+('CLIENTE', 13, 'Méndez', 'lucia@email.com', 'Lucía', '$2a$10$o9XPgXyi3Adp6WUtBJ7dx.iEkoORndupKh0qzGOMedp3FZa/WjGYW', 'CLIENTE', 'lucia.user', NULL),
+('CLIENTE', 14, 'Vargas', 'elena@email.com', 'Elena', '$2a$10$gNN3BfYXbDdPLMxB9jytdunvo9fUhZCy0PSgECTrYejL77Cm/rsGK', 'CLIENTE', 'elena.vargas', NULL),
+('CLIENTE', 15, 'lamichhane', 'suman@gmail.com', 'suman', '$2a$10$tEjfk/g9OtUoh1tHvqWGIeMRPRIdiEErB/opn8CEJMcAQZPtSIOsy', 'CLIENTE', 'cliente_suman', NULL),
+('ADMIN', 16, 'Apellidos...', 'davidaa.admin@peluqueria.com', 'aa', '$2a$10$Jyg6uOGkIZhn4HHRrSLrqu8YX.m2WoSCKEHm/omBHYtWFHyG8ZpnO', 'ADMIN', 'a', NULL),
+('CLIENTE', 17, 'lamichhane', 'lamichhanesuman79@gmail.com', 'suman', '$2a$10$RmB1pwDTVkDjitHt0otyiO5Oqf2ZGsirhSsKXiIuPw4tyZR7VRhI.', 'CLIENTE', 'sumlan', NULL),
+('CLIENTE', 18, 'lula', 'lulelala@test.com', 'lale', '$2a$10$1Dd2PUO3MKaCVRWuILaooOQJ6G/FKzylPGjCFviH4PiqQH5UKofq.', 'CLIENTE', 'cliente_lale', NULL),
+('CLIENTE', 19, 'xata', 'okxata@gmail.com', 'ok', '$2a$10$yt58DpTGQU3WRh37Oya3sur6gfTA2d7KNgj0lN7hv77uqLR.yh1VC', 'CLIENTE', 'cliente_ok', NULL),
+('CLIENTE', 20, 'shyam', 'ramshyam@gmail.com', 'ram', '$2a$10$n2sLYmelOY0vRloXr8YVS.Amj1nEYurqRE9xCvQhHoh3tWHbdBaj.', 'CLIENTE', 'cliente_ram', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `valoracion`
+--
+
+CREATE TABLE `valoracion` (
+  `id_valoracion` bigint(20) NOT NULL,
+  `id_cita` bigint(20) NOT NULL,
+  `puntuacion` int(11) NOT NULL,
+  `fecha_valoracion` datetime DEFAULT current_timestamp(),
+  `comentario` text DEFAULT NULL,
+  `imagen_base64` longtext DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `valoracion`
+--
+
+INSERT INTO `valoracion` (`id_valoracion`, `id_cita`, `puntuacion`, `fecha_valoracion`, `comentario`, `imagen_base64`) VALUES
+(1, 3, 5, '2026-01-21 12:30:00', 'Muy buen trato y resultado perfecto.', NULL),
+(2, 4, 4, '2026-01-21 13:00:00', 'Me ha gustado, aunque un poco de espera.', NULL),
+(3, 5, 3, '2026-01-21 13:30:00', 'Servicio correcto, podría mejorar la puntualidad.', NULL),
+(4, 6, 5, '2026-01-21 14:00:00', 'Excelente experiencia, repetiré seguro.', NULL);
 
 --
 -- Índices para tablas volcadas
@@ -449,6 +475,13 @@ ALTER TABLE `usuarios`
   ADD UNIQUE KEY `UKm2dvbwfge291euvmk6vkkocao` (`username`);
 
 --
+-- Indices de la tabla `valoracion`
+--
+ALTER TABLE `valoracion`
+  ADD PRIMARY KEY (`id_valoracion`),
+  ADD KEY `FK_valoracion_cita` (`id_cita`);
+
+--
 -- AUTO_INCREMENT de las tablas volcadas
 --
 
@@ -481,6 +514,12 @@ ALTER TABLE `tipo_servicio`
 --
 ALTER TABLE `usuarios`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT de la tabla `valoracion`
+--
+ALTER TABLE `valoracion`
+  MODIFY `id_valoracion` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Restricciones para tablas volcadas
@@ -525,6 +564,12 @@ ALTER TABLE `horario_semanal`
 --
 ALTER TABLE `servicio`
   ADD CONSTRAINT `FK5g48yc2sr5ecks0ay9leesuv2` FOREIGN KEY (`tipo_servicio_id`) REFERENCES `tipo_servicio` (`id`);
+
+--
+-- Filtros para la tabla `valoracion`
+--
+ALTER TABLE `valoracion`
+  ADD CONSTRAINT `FK_valoracion_cita` FOREIGN KEY (`id_cita`) REFERENCES `citas` (`id_cita`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
