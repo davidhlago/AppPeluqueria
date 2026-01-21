@@ -13,15 +13,21 @@ public interface ValoracionRepository extends JpaRepository<Valoracion, Long> {
 
     List<Valoracion> findByCita(Cita cita);
 
-    // Media de puntuación de un servicio concreto (por idServicio)
-    @Query("SELECT AVG(v.puntuacion) " +
-            "FROM Valoracion v " +
-            "WHERE v.cita.horarioSemanal.servicio.idServicio = :idServicio")
-    Double mediaPuntuacionPorServicio(Long idServicio);
+
 
     // Todas las valoraciones de un servicio concreto
     @Query("SELECT v " +
             "FROM Valoracion v " +
             "WHERE v.cita.horarioSemanal.servicio.idServicio = :idServicio")
     List<Valoracion> findByServicio(Long idServicio);
+
+    @Query("""
+       SELECT AVG(v.puntuacion)
+       FROM Valoracion v
+       JOIN v.cita c
+       JOIN c.horarioSemanal hs
+       JOIN hs.servicio s
+       WHERE s.idServicio = :idServicio
+       """)
+    Double mediaPuntuacionPorServicio(Long idServicio);
 }

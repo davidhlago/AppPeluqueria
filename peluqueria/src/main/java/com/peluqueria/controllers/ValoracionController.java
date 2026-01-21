@@ -3,9 +3,11 @@ package com.peluqueria.controllers;
 import com.peluqueria.entity.Valoracion;
 import com.peluqueria.repository.ValoracionRepository;
 import com.peluqueria.security.service.ServicioValoracion;
+import com.peluqueria.security.service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,9 +28,13 @@ public class ValoracionController {
     @PreAuthorize("hasAuthority('CLIENTE')")
     public ResponseEntity<Valoracion> crearValoracion(
             @PathVariable Long idCita,
-            @RequestBody Valoracion valoracion) {
+            @RequestBody Valoracion valoracion,
+            Authentication authentication) {
 
-        Valoracion creada = servicioValoracion.crearValoracion(valoracion, idCita);
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Long idCliente = userDetails.getId(); // por si lo necesitas en el servicio
+
+        Valoracion creada = servicioValoracion.crearValoracion(valoracion, idCita /*, idCliente */);
         return ResponseEntity.status(201).body(creada);
     }
 

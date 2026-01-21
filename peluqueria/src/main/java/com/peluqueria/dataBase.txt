@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 21-01-2026 a las 12:15:40
+-- Tiempo de generación: 21-01-2026 a las 13:47:25
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -77,7 +77,16 @@ INSERT INTO `citas` (`id_cita`, `estado`, `fecha`, `hora_fin`, `hora_inicio`, `i
 (12, 'CONFIRMADA', '2026-01-19', '15:30:00.000000', '15:00:00.000000', 6, 10, 21),
 (13, 'CONFIRMADA', '2026-01-22', '11:50:00.000000', '11:20:00.000000', 6, 9, 20),
 (14, 'CONFIRMADA', '2026-01-22', '11:50:00.000000', '11:20:00.000000', 6, 9, 20),
-(15, 'CONFIRMADA', '2026-01-19', '09:35:00.000000', '08:50:00.000000', 6, 9, 1);
+(15, 'CONFIRMADA', '2026-01-19', '09:35:00.000000', '08:50:00.000000', 6, 9, 1),
+(16, 'CONFIRMADA', '2026-01-22', '10:30:00.000000', '10:00:00.000000', 6, 10, 21),
+(17, 'CONFIRMADA', '2026-01-22', '11:30:00.000000', '11:00:00.000000', 6, 10, 21),
+(18, 'CONFIRMADA', '2026-01-23', '12:30:00.000000', '12:00:00.000000', 6, 10, 21),
+(19, 'CONFIRMADA', '2026-01-22', '10:30:00.000000', '10:00:00.000000', 6, 10, 21),
+(20, 'CONFIRMADA', '2026-01-22', '11:30:00.000000', '11:00:00.000000', 6, 10, 21),
+(21, 'CONFIRMADA', '2026-01-23', '12:30:00.000000', '12:00:00.000000', 6, 10, 21),
+(22, 'CONFIRMADA', '2026-01-22', '10:30:00.000000', '10:00:00.000000', 6, 10, 30),
+(23, 'CONFIRMADA', '2026-01-22', '11:30:00.000000', '11:00:00.000000', 6, 10, 30),
+(24, 'CONFIRMADA', '2026-01-23', '12:30:00.000000', '12:00:00.000000', 6, 10, 30);
 
 -- --------------------------------------------------------
 
@@ -229,7 +238,8 @@ INSERT INTO `horario_semanal` (`id_horario_semana`, `dias_semana`, `hora_fin`, `
 (74, 'Viernes', '12:55:00.000000', '11:05:00.000000', 9, 58, 2),
 (75, 'Lunes', '14:00:00.000000', '11:05:00.000000', 9, 59, 2),
 (76, 'Martes', '14:00:00.000000', '11:05:00.000000', 9, 59, 2),
-(77, 'Viernes', '20:45:00.000000', '19:00:00.000000', 10, 59, 2);
+(77, 'Viernes', '20:45:00.000000', '19:00:00.000000', 10, 59, 2),
+(78, 'LUNES', '14:00:00.000000', '10:00:00.000000', 10, 12, 5);
 
 -- --------------------------------------------------------
 
@@ -408,9 +418,24 @@ CREATE TABLE `valoracion` (
 
 INSERT INTO `valoracion` (`id_valoracion`, `id_cita`, `puntuacion`, `fecha_valoracion`, `comentario`, `imagen_base64`) VALUES
 (1, 3, 5, '2026-01-21 12:30:00', 'Muy buen trato y resultado perfecto.', NULL),
-(2, 4, 4, '2026-01-21 13:00:00', 'Me ha gustado, aunque un poco de espera.', NULL),
-(3, 5, 3, '2026-01-21 13:30:00', 'Servicio correcto, podría mejorar la puntualidad.', NULL),
-(4, 6, 5, '2026-01-21 14:00:00', 'Excelente experiencia, repetiré seguro.', NULL);
+(3, 5, 4, '2026-01-21 13:30:00', 'Actualizo mi valoración desde Postman', NULL),
+(4, 6, 5, '2026-01-21 14:00:00', 'Excelente experiencia, repetiré seguro.', NULL),
+(5, 6, 5, '2026-01-21 11:47:49', 'Prueba desde Postman', NULL),
+(6, 12, 5, '2026-01-21 11:57:39', 'Manicura Express perfecta', NULL),
+(7, 11, 3, '2026-01-21 12:03:34', 'Manicura Express normalita', NULL),
+(8, 10, 1, '2026-01-21 12:04:41', 'buuuuuuu', NULL),
+(9, 9, 2, '2026-01-21 12:04:53', 'baaaaaa', NULL),
+(10, 8, 5, '2026-01-21 12:05:08', 'lu', NULL),
+(11, 16, 5, '2026-01-21 13:10:00', 'Manicura Express espectacular', NULL),
+(12, 16, 4, '2026-01-21 13:15:00', 'Muy buen servicio', NULL),
+(13, 17, 3, '2026-01-21 13:20:00', 'Correcto, pero mejorable', NULL),
+(14, 18, 5, '2026-01-21 13:25:00', 'Perfecto resultado de uñas', NULL),
+(15, 16, 5, '2026-01-21 13:30:00', 'Servicio 12 cita 16', NULL),
+(16, 17, 3, '2026-01-21 13:35:00', 'Servicio 12 cita 17', NULL),
+(17, 18, 4, '2026-01-21 13:40:00', 'Servicio 12 cita 18', NULL),
+(18, 22, 5, '2026-01-21 13:30:00', 'Servicio 12 cita 22', NULL),
+(19, 23, 3, '2026-01-21 13:35:00', 'Servicio 12 cita 23', NULL),
+(20, 24, 4, '2026-01-21 13:40:00', 'Servicio 12 cita 24', NULL);
 
 --
 -- Índices para tablas volcadas
@@ -489,13 +514,13 @@ ALTER TABLE `valoracion`
 -- AUTO_INCREMENT de la tabla `citas`
 --
 ALTER TABLE `citas`
-  MODIFY `id_cita` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id_cita` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT de la tabla `horario_semanal`
 --
 ALTER TABLE `horario_semanal`
-  MODIFY `id_horario_semana` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
+  MODIFY `id_horario_semana` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- AUTO_INCREMENT de la tabla `servicio`
@@ -519,7 +544,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `valoracion`
 --
 ALTER TABLE `valoracion`
-  MODIFY `id_valoracion` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_valoracion` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- Restricciones para tablas volcadas
