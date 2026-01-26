@@ -13,10 +13,9 @@ import com.peluqueria.payload.response.JwtResponse;
 import com.peluqueria.payload.response.MessageResponse;
 import com.peluqueria.repository.UsuarioRepository;
 import com.peluqueria.security.jwt.JwtUtils;
-// 👇 IMPORTANTE: Importa tu servicio correctamente
 import com.peluqueria.security.service.ServicioEmail;
+import com.peluqueria.security.service.UserDetailsImpl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,26 +38,29 @@ import java.util.UUID;
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtUtils jwtUtils;
-
-    // 👇 CORRECCIÓN: El tipo debe ser la clase 'ServicioEmail'
-    @Autowired
-    private ServicioEmail emailService;
+    // Inyección por constructor para evitar fallos de inicialización del Bean
+    private final AuthenticationManager authenticationManager;
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
+    private final ServicioEmail emailService;
 
     @Value("${google.clientId}")
     private String googleClientId;
 
-    // ---------------- LOGIN NORMAL ----------------
+    public AuthController(AuthenticationManager authenticationManager,
+                          UsuarioRepository usuarioRepository,
+                          PasswordEncoder passwordEncoder,
+                          JwtUtils jwtUtils,
+                          ServicioEmail emailService) {
+        this.authenticationManager = authenticationManager;
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
+        this.emailService = emailService;
+    }
+
+    // ---------------- LOG IN ----------------
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LogInRequest loginRequest) {
         try {
@@ -70,14 +72,12 @@ public class AuthController {
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            com.peluqueria.security.service.UserDetailsImpl userDetails =
-                    (com.peluqueria.security.service.UserDetailsImpl) authentication.getPrincipal();
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
             String rol = userDetails.getAuthorities().stream()
                     .findFirst()
                     .map(a -> a.getAuthority())
-                    .orElse(null);
+                    .orElse("CLIENTE");
 
             String jwt = jwtUtils.generarToken(userDetails.getUsername(), rol);
 
@@ -95,65 +95,7 @@ public class AuthController {
         }
     }
 
-    // ---------------- LOGIN CON GOOGLE ----------------
-    @PostMapping("/google")
-    public ResponseEntity<?> loginWithGoogle(@RequestBody Map<String, Object> data) {
-        System.out.println("🚀 Backend: Petición Google recibida");
-
-        try {
-            String idTokenString = (String) data.get("idToken");
-
-            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                    .setAudience(Collections.singletonList(googleClientId))
-                    .build();
-
-            GoogleIdToken idToken = verifier.verify(idTokenString);
-
-            if (idToken == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
-            }
-
-            GoogleIdToken.Payload payload = idToken.getPayload();
-            String email = payload.getEmail();
-            String nombre = (String) payload.get("name");
-            String googleId = payload.getSubject();
-
-            Usuario usuario = usuarioRepository.findByEmail(email);
-
-            if (usuario == null) {
-                Cliente nuevoCliente = new Cliente();
-                nuevoCliente.setEmail(email);
-                nuevoCliente.setNombre(nombre);
-                nuevoCliente.setApellidos("");
-                nuevoCliente.setUsername(email.split("@")[0] + "_" + googleId.substring(0, 4));
-                nuevoCliente.setRol("CLIENTE");
-                nuevoCliente.setPassword(passwordEncoder.encode("GOOGLE_USER_" + UUID.randomUUID().toString()));
-
-                usuario = usuarioRepository.save(nuevoCliente);
-            }
-
-            String token = jwtUtils.generarToken(usuario.getUsername(), usuario.getRol());
-
-            return ResponseEntity.ok(new JwtResponse(
-                    token,
-                    usuario.getId(),
-                    usuario.getNombre(),
-                    usuario.getApellidos() != null ? usuario.getApellidos() : "",
-                    usuario.getUsername(),
-                    usuario.getRol()
-            ));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new MessageResponse("Error en autenticación Google: " + e.getMessage()));
-        }
-    }
-
-    // ====================================================================
-    // 👇👇👇 ZONA DE RECUPERACIÓN DE CONTRASEÑA 👇👇👇
-    // ====================================================================
-
+    // ---------------- RECUPERAR CONTRASEÑA ----------------
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
         String email = request.get("email");
@@ -167,7 +109,6 @@ public class AuthController {
         usuario.setResetToken(code);
         usuarioRepository.save(usuario);
 
-        // 👇 CORRECCIÓN: Usamos la variable 'emailService', NO la clase estática
         try {
             emailService.enviarCodigoRecuperacion(email, code);
             return ResponseEntity.ok("{\"mensaje\": \"Código enviado a tu correo\"}");
@@ -184,12 +125,8 @@ public class AuthController {
 
         Usuario usuario = usuarioRepository.findByEmail(email);
 
-        if (usuario == null) {
-            return ResponseEntity.badRequest().body("Usuario no encontrado");
-        }
-
-        if (usuario.getResetToken() == null || !usuario.getResetToken().equals(code)) {
-            return ResponseEntity.badRequest().body("Código inválido o expirado");
+        if (usuario == null || usuario.getResetToken() == null || !usuario.getResetToken().equals(code)) {
+            return ResponseEntity.badRequest().body("Usuario no encontrado o código inválido");
         }
 
         usuario.setPassword(passwordEncoder.encode(newPassword));
@@ -199,36 +136,27 @@ public class AuthController {
         return ResponseEntity.ok("{\"mensaje\": \"Contraseña actualizada correctamente\"}");
     }
 
-    // ====================================================================
-    // ---------------- SIGNUP METHODS ----------------
-    // ====================================================================
+    // ---------------- SIGN UP (REGISTRO) ----------------
+    @PostMapping("/signup/cliente")
+    public ResponseEntity<?> crearCliente(@Valid @RequestBody Cliente cliente) {
+        if (usuarioRepository.findByUsername(cliente.getUsername()) != null) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Usuario en uso."));
+        }
+        cliente.setPassword(passwordEncoder.encode(cliente.getPassword()));
+        cliente.setRol("CLIENTE");
+        usuarioRepository.save(cliente);
+        return ResponseEntity.ok(new MessageResponse("Cliente registrado correctamente."));
+    }
 
     @PostMapping("/signup/admin")
     public ResponseEntity<?> crearAdmin(@Valid @RequestBody Admin admin) {
         if (usuarioRepository.findByUsername(admin.getUsername()) != null) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Usuario en uso."));
         }
-        if (usuarioRepository.findByEmail(admin.getEmail()) != null) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email en uso."));
-        }
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
         admin.setRol("ADMIN");
         usuarioRepository.save(admin);
-        return ResponseEntity.ok(new MessageResponse("Admin creado correctamente."));
-    }
-
-    @PostMapping("/signup/cliente")
-    public ResponseEntity<?> crearCliente(@Valid @RequestBody Cliente cliente) {
-        if (usuarioRepository.findByUsername(cliente.getUsername()) != null) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Usuario en uso."));
-        }
-        if (usuarioRepository.findByEmail(cliente.getEmail()) != null) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email en uso."));
-        }
-        cliente.setPassword(passwordEncoder.encode(cliente.getPassword()));
-        cliente.setRol("CLIENTE");
-        usuarioRepository.save(cliente);
-        return ResponseEntity.ok(new MessageResponse("Cliente creado correctamente."));
+        return ResponseEntity.ok(new MessageResponse("Administrador registrado correctamente."));
     }
 
     @PostMapping("/signup/grupo")
@@ -236,26 +164,9 @@ public class AuthController {
         if (usuarioRepository.findByUsername(grupo.getUsername()) != null) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Usuario en uso."));
         }
-        if (usuarioRepository.findByEmail(grupo.getEmail()) != null) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email en uso."));
-        }
         grupo.setPassword(passwordEncoder.encode(grupo.getPassword()));
         grupo.setRol("GRUPO");
         usuarioRepository.save(grupo);
-        return ResponseEntity.ok(new MessageResponse("Grupo creado correctamente."));
-    }
-
-    @PostMapping("/signup/mobile")
-    public ResponseEntity<?> crearClienteDesdeMovil(@Valid @RequestBody Cliente cliente) {
-        if (usuarioRepository.findByUsername(cliente.getUsername()) != null) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Usuario en uso."));
-        }
-        if (usuarioRepository.findByEmail(cliente.getEmail()) != null) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email en uso."));
-        }
-        cliente.setPassword(passwordEncoder.encode(cliente.getPassword()));
-        cliente.setRol("CLIENTE");
-        usuarioRepository.save(cliente);
-        return ResponseEntity.ok(new MessageResponse("Cliente creado correctamente."));
+        return ResponseEntity.ok(new MessageResponse("Grupo registrado correctamente."));
     }
 }
