@@ -22,29 +22,44 @@ public class HorarioSemanalController {
         return servicioHorario.obtenerTodos();
     }
 
-    @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public HorarioSemanal crear(@RequestBody HorarioSemanal horario) {
-        return servicioHorario.guardarHorario(horario);
-    }
-
     @GetMapping("/grupo/{id}")
     public List<HorarioSemanal> porGrupo(@PathVariable Long id) {
         return servicioHorario.obtenerPorGrupo(id);
     }
 
+    // --- CREAR ---
+    @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> crear(@RequestBody HorarioSemanal horario) {
+        try {
+            HorarioSemanal creado = servicioHorario.guardarHorario(horario);
+            return ResponseEntity.ok(creado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // --- ACTUALIZAR ---
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody HorarioSemanal horarioDetails) {
+        try {
+            HorarioSemanal actualizado = servicioHorario.actualizarHorario(id, horarioDetails);
+            return ResponseEntity.ok(actualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // --- ELIMINAR ---
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> eliminar(@PathVariable Long id) {
-        servicioHorario.eliminarHorario(id);
-        return ResponseEntity.ok("Horario eliminado");
-    }
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public HorarioSemanal actualizar(@PathVariable Long id, @RequestBody HorarioSemanal horarioDetails) {
-        HorarioSemanal horario = servicioHorario.obtenerPorId(id);
-        horario.setCupoMaximo(horarioDetails.getCupoMaximo());
-        horario.setDiasSemana(horarioDetails.getDiasSemana());
-        return servicioHorario.guardarHorario(horario);
+        try {
+            servicioHorario.eliminarHorario(id);
+            return ResponseEntity.ok("Horario eliminado correctamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
 }

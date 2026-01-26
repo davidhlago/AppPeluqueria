@@ -115,4 +115,9 @@ public class CitaController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
+    @GetMapping("/dias-disponibles")
+    public ResponseEntity<List<Integer>> getDiasLaborables(@RequestParam Long idServicio) {
+        return ResponseEntity.ok(citaService.obtenerDiasLaborablesPorServicio(idServicio));
+    }
 }

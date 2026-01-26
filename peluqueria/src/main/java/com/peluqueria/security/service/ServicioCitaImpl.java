@@ -203,4 +203,42 @@ public class ServicioCitaImpl implements ServicioCita {
             default: return "";
         }
     }
+
+
+    @Override
+    public List<Integer> obtenerDiasLaborablesPorServicio(Long idServicio) {
+        // 1. Buscamos en la BD los días como String (ej: "LUNES", "JUEVES")
+        // Nota: Asegúrate de tener este método en tu HorarioSemanalRepository
+        List<String> diasStr = horarioRepository.findDiasByServicioId(idServicio);
+
+        List<Integer> diasInt = new ArrayList<>();
+
+        // 2. Convertimos Texto -> Número (1=Lunes ... 7=Domingo)
+        for (String dia : diasStr) {
+            diasInt.add(convertirDiaANumero(dia));
+        }
+
+        return diasInt;
+    }
+
+    // Método auxiliar para traducir lo que hay en BD a números de Flutter
+    private int convertirDiaANumero(String dia) {
+        if (dia == null) return 0;
+
+        // Normalizamos: mayúsculas y sin tildes
+        String d = dia.toUpperCase().trim()
+                .replace("Á", "A").replace("É", "E")
+                .replace("Í", "I").replace("Ó", "O").replace("Ú", "U");
+
+        switch (d) {
+            case "LUNES": return 1;
+            case "MARTES": return 2;
+            case "MIERCOLES": return 3;
+            case "JUEVES": return 4;
+            case "VIERNES": return 5;
+            case "SABADO": return 6;
+            case "DOMINGO": return 7;
+            default: return 0;
+        }
+    }
 }

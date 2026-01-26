@@ -22,4 +22,5 @@ public interface ServicioCita {
 
     // EL NUEVO MÉTODO PARA FLUTTER
     List<Map<String, Object>> obtenerHuecosPorServicioYFecha(Long idServicio, LocalDate fecha);
+    List<Integer> obtenerDiasLaborablesPorServicio(Long idServicio);
 }
