@@ -1,10 +1,11 @@
 package com.peluqueria.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore; // <--- IMPORTANTE
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty; // <--- 1. IMPORTANTE IMPORTAR ESTO
 import jakarta.persistence.*;
-import java.util.HashSet; // <--- NUEVO IMPORT
-import java.util.Set;     // <--- NUEVO IMPORT
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "servicio")
@@ -37,20 +38,21 @@ public class Servicio {
     private String imagenBase64;
 
     // -----------------------------------------------------------
-    // ✅ NUEVA RELACIÓN INVERSA (Para contar likes)
+    // RELACIÓN INVERSA (Para contar likes)
     // -----------------------------------------------------------
     @ManyToMany(mappedBy = "serviciosFavoritos", fetch = FetchType.LAZY)
-    @JsonIgnore // ¡CRÍTICO! Esto evita que al pedir un servicio te traiga 1000 clientes
+    @JsonIgnore // CRÍTICO: Evita bucle infinito al serializar
     private Set<Cliente> clientesFans = new HashSet<>();
 
     public Servicio() {}
 
     // -----------------------------------------------------------
-    // ✅ MÉTODO EXTRA PARA EL FRONTEND
+    // ✅ MÉTODO EXTRA PARA EL JSON (Contador)
     // -----------------------------------------------------------
-    // Este método devuelve el número de likes sin tener que enviar toda la lista de personas
-    @Transient // No es un campo de la BD, se calcula al vuelo
+    @Transient
+    @JsonProperty("cantidadLikes") // <--- 2. ESTO OBLIGA A ENVIAR EL CAMPO AL JSON
     public int getNumeroLikes() {
+        if (clientesFans == null) return 0; // Protección extra por si es null
         return clientesFans.size();
     }
 
@@ -70,7 +72,6 @@ public class Servicio {
     public String getImagenBase64() { return imagenBase64; }
     public void setImagenBase64(String imagenBase64) { this.imagenBase64 = imagenBase64; }
 
-    // ✅ Getters y Setters NUEVOS
     public Set<Cliente> getClientesFans() { return clientesFans; }
     public void setClientesFans(Set<Cliente> clientesFans) { this.clientesFans = clientesFans; }
 }
