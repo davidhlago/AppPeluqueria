@@ -19,4 +19,7 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
             value = "SELECT * FROM servicio s WHERE s.duracion_bloques > :minDuracion",
             nativeQuery = true)
     List<Servicio> buscarPorDuracionMinima(@Param("minDuracion") int minDuracion);
+
+    @Query("SELECT s FROM Servicio s LEFT JOIN s.clientesFans c GROUP BY s ORDER BY COUNT(c) DESC")
+    List<Servicio> findTopServiciosMasPopulares();
 }
