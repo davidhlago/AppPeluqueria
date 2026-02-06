@@ -16,4 +16,6 @@ public class PeluqueriaApplication {
 //SET GLOBAL max_allowed_packet = 16777216;
 
 
+
+
 //http://localhost:8080/swagger-ui/index.html#/
