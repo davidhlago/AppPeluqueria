@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 02-02-2026 a las 10:32:32
+-- Tiempo de generación: 09-02-2026 a las 09:43:48
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -42,6 +42,36 @@ INSERT INTO `admin` (`especialidad`, `id`) VALUES
 ('Contabilidad', 4),
 ('Gestión de Personal', 12),
 ('Marketing Digital', 16);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `bloqueo_horario`
+--
+
+CREATE TABLE `bloqueo_horario` (
+  `id_bloqueo` bigint(20) NOT NULL,
+  `fecha` date NOT NULL,
+  `hora_fin` time(6) DEFAULT NULL,
+  `hora_inicio` time(6) DEFAULT NULL,
+  `motivo` varchar(255) DEFAULT NULL,
+  `todo_el_dia` tinyint(1) DEFAULT NULL,
+  `id_grupo` bigint(20) DEFAULT NULL,
+  `id_servicio` bigint(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `bloqueo_horario`
+--
+
+INSERT INTO `bloqueo_horario` (`id_bloqueo`, `fecha`, `hora_fin`, `hora_inicio`, `motivo`, `todo_el_dia`, `id_grupo`, `id_servicio`) VALUES
+(1, '2026-05-02', NULL, NULL, 'Fiesta corregida', 1, 9, NULL),
+(2, '2026-05-20', NULL, NULL, 'Excursión a fábrica de tintes', 1, 9, NULL),
+(3, '2026-01-21', '11:00:00.000000', '08:00:00.000000', 'Examen Teórico Trimestral', 0, 9, NULL),
+(4, '2026-02-10', NULL, NULL, 'Avería máquina láser', 1, NULL, 1),
+(5, '2026-03-15', '16:00:00.000000', '14:00:00.000000', 'Revisión técnica equipos', 0, NULL, 1),
+(6, '2026-05-01', NULL, NULL, 'Fiesta del Trabajo - Cerrado', 1, NULL, NULL),
+(8, '2026-02-21', NULL, NULL, 'Avería Máquina Láser', 1, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -88,7 +118,8 @@ INSERT INTO `citas` (`id_cita`, `estado`, `fecha`, `hora_fin`, `hora_inicio`, `i
 (23, 'CONFIRMADA', '2026-01-22', '11:30:00.000000', '11:00:00.000000', 6, 10, 30),
 (24, 'CONFIRMADA', '2026-01-23', '12:30:00.000000', '12:00:00.000000', 6, 10, 30),
 (25, 'CANCELADA', '2026-01-26', '10:06:00.000000', '09:21:00.000000', 5, 9, 1),
-(26, 'CONFIRMADA', '2026-02-02', '10:06:00.000000', '09:21:00.000000', 5, 9, 1);
+(26, 'CONFIRMADA', '2026-02-02', '10:06:00.000000', '09:21:00.000000', 5, 9, 1),
+(27, 'CONFIRMADA', '2026-02-09', '10:05:00.000000', '09:20:00.000000', 5, 9, 1);
 
 -- --------------------------------------------------------
 
@@ -139,6 +170,7 @@ CREATE TABLE `favoritos_cliente_servicio` (
 
 INSERT INTO `favoritos_cliente_servicio` (`id_cliente`, `id_servicio`) VALUES
 (6, 1),
+(6, 2),
 (6, 34);
 
 -- --------------------------------------------------------
@@ -470,6 +502,14 @@ ALTER TABLE `admin`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `bloqueo_horario`
+--
+ALTER TABLE `bloqueo_horario`
+  ADD PRIMARY KEY (`id_bloqueo`),
+  ADD KEY `FKfjpfhc68cyi1xja0v89jufsxe` (`id_grupo`),
+  ADD KEY `FKih3r9godeigqtnpuv0jq6olky` (`id_servicio`);
+
+--
 -- Indices de la tabla `citas`
 --
 ALTER TABLE `citas`
@@ -540,10 +580,16 @@ ALTER TABLE `valoracion`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `bloqueo_horario`
+--
+ALTER TABLE `bloqueo_horario`
+  MODIFY `id_bloqueo` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
 -- AUTO_INCREMENT de la tabla `citas`
 --
 ALTER TABLE `citas`
-  MODIFY `id_cita` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id_cita` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT de la tabla `horario_semanal`
@@ -584,6 +630,13 @@ ALTER TABLE `valoracion`
 --
 ALTER TABLE `admin`
   ADD CONSTRAINT `FKhjrv95ryqymlav9uct846evsa` FOREIGN KEY (`id`) REFERENCES `usuarios` (`id`);
+
+--
+-- Filtros para la tabla `bloqueo_horario`
+--
+ALTER TABLE `bloqueo_horario`
+  ADD CONSTRAINT `FKfjpfhc68cyi1xja0v89jufsxe` FOREIGN KEY (`id_grupo`) REFERENCES `grupo` (`id`),
+  ADD CONSTRAINT `FKih3r9godeigqtnpuv0jq6olky` FOREIGN KEY (`id_servicio`) REFERENCES `servicio` (`id_servicio`);
 
 --
 -- Filtros para la tabla `citas`
