@@ -99,4 +99,16 @@ public class BloqueoHorarioController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    //editar
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> actualizarBloqueo(@PathVariable Long id, @RequestBody BloqueoHorario bloqueoDetails) {
+        try {
+            BloqueoHorario actualizado = servicioBloqueo.actualizarBloqueo(id, bloqueoDetails);
+            return ResponseEntity.ok(actualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

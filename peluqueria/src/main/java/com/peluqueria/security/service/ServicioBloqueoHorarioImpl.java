@@ -111,4 +111,57 @@ public class ServicioBloqueoHorarioImpl implements ServicioBloqueoHorario {
         return bloqueoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Bloqueo no encontrado con ID: " + id));
     }
+
+    @Override
+    @Transactional
+    public BloqueoHorario actualizarBloqueo(Long id, BloqueoHorario datosNuevos) {
+        // 1. Buscar el bloqueo existente
+        BloqueoHorario actual = bloqueoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No se encontró el bloqueo con ID: " + id));
+
+        // 2. Actualizar datos simples
+        actual.setFecha(datosNuevos.getFecha());
+        actual.setMotivo(datosNuevos.getMotivo());
+        actual.setTodoElDia(datosNuevos.isTodoElDia());
+
+        // 3. Validar y actualizar horas
+        if (datosNuevos.isTodoElDia()) {
+            actual.setHoraInicio(null);
+            actual.setHoraFin(null);
+        } else {
+            if (datosNuevos.getHoraInicio() == null || datosNuevos.getHoraFin() == null) {
+                throw new RuntimeException("Si no es todo el día, las horas son obligatorias");
+            }
+            if (datosNuevos.getHoraInicio().isAfter(datosNuevos.getHoraFin())) {
+                throw new RuntimeException("La hora inicio no puede ser mayor a la fin");
+            }
+            actual.setHoraInicio(datosNuevos.getHoraInicio());
+            actual.setHoraFin(datosNuevos.getHoraFin());
+        }
+
+        // 4. Actualizar Relaciones (Grupo y Servicio)
+        // IMPORTANTE: Buscamos de nuevo para evitar TransientObjectException
+
+        // Actualizar Grupo
+        if (datosNuevos.getGrupo() != null && datosNuevos.getGrupo().getId() != null) {
+            Grupo g = grupoRepository.findById(datosNuevos.getGrupo().getId())
+                    .orElseThrow(() -> new RuntimeException("Grupo no encontrado"));
+            actual.setGrupo(g);
+        } else {
+            // Si viene null, significa que ahora es un bloqueo GLOBAL (para todos los grupos)
+            actual.setGrupo(null);
+        }
+
+        // Actualizar Servicio
+        if (datosNuevos.getServicio() != null && datosNuevos.getServicio().getIdServicio() != null) {
+            Servicio s = servicioRepository.findById(datosNuevos.getServicio().getIdServicio())
+                    .orElseThrow(() -> new RuntimeException("Servicio no encontrado"));
+            actual.setServicio(s);
+        } else {
+            // Si viene null, significa que ahora bloquea TODOS los servicios
+            actual.setServicio(null);
+        }
+
+        return bloqueoRepository.save(actual);
+    }
 }

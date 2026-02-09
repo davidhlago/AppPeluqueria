@@ -22,5 +22,7 @@ public interface ServicioBloqueoHorario {
 
     void eliminarBloqueo(Long id);
 
+    BloqueoHorario actualizarBloqueo(Long id, BloqueoHorario bloqueoDetails);
+
     BloqueoHorario obtenerPorId(Long id);
 }
