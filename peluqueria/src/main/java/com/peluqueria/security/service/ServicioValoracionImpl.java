@@ -34,6 +34,10 @@ public class ServicioValoracionImpl implements ServicioValoracion {
             throw new IllegalArgumentException("La puntuación debe estar entre 1 y 5");
         }
 
+        // Actualizar estado de la cita a COMPLETADA
+        cita.setEstado("COMPLETADA");
+        citaRepository.save(cita);
+
         return valoracionRepository.save(valoracion);
     }
 
