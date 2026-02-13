@@ -23,7 +23,6 @@ public class ValoracionController {
     @Autowired
     private ValoracionRepository valoracionRepository;
 
-    // Crear valoración para una cita concreta
     @PostMapping("/cita/{idCita}")
     @PreAuthorize("hasAuthority('CLIENTE')")
     public ResponseEntity<Valoracion> crearValoracion(
@@ -32,13 +31,13 @@ public class ValoracionController {
             Authentication authentication) {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        Long idCliente = userDetails.getId(); // por si lo necesitas en el servicio
+        Long idCliente = userDetails.getId();
 
-        Valoracion creada = servicioValoracion.crearValoracion(valoracion, idCita /* , idCliente */);
+        // Pasamos los 3 parámetros: objeto, id de cita e id del cliente logueado
+        Valoracion creada = servicioValoracion.crearValoracion(valoracion, idCita, idCliente);
         return ResponseEntity.status(201).body(creada);
     }
 
-    // Actualizar una valoración (p.ej. cambiar comentario o foto)
     @PutMapping("/{idValoracion}")
     @PreAuthorize("hasAuthority('CLIENTE') or hasAuthority('ADMIN')")
     public ResponseEntity<Valoracion> actualizarValoracion(
@@ -49,7 +48,6 @@ public class ValoracionController {
         return ResponseEntity.ok(actualizada);
     }
 
-    // Borrar una valoración
     @DeleteMapping("/{idValoracion}")
     @PreAuthorize("hasAuthority('CLIENTE') or hasAuthority('ADMIN')")
     public ResponseEntity<Void> eliminarValoracion(@PathVariable Long idValoracion) {
@@ -57,14 +55,12 @@ public class ValoracionController {
         return ResponseEntity.noContent().build();
     }
 
-    // Listar valoraciones de una cita
     @GetMapping("/cita/{idCita}")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO') or hasAuthority('CLIENTE')")
     public ResponseEntity<List<Valoracion>> listarPorCita(@PathVariable Long idCita) {
         return ResponseEntity.ok(servicioValoracion.obtenerPorCita(idCita));
     }
 
-    // Listar todas (solo admin)
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<Valoracion>> listarTodas() {
@@ -78,10 +74,10 @@ public class ValoracionController {
     }
 
     @ExceptionHandler(com.peluqueria.exception.ValoracionException.class)
-    @ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
     public ResponseEntity<com.peluqueria.advice.ErrorMessage> handleValoracionException(
             com.peluqueria.exception.ValoracionException ex,
             org.springframework.web.context.request.WebRequest request) {
+
         com.peluqueria.advice.ErrorMessage message = new com.peluqueria.advice.ErrorMessage(
                 org.springframework.http.HttpStatus.BAD_REQUEST.value(),
                 new java.util.Date(),
@@ -90,5 +86,4 @@ public class ValoracionController {
 
         return new ResponseEntity<>(message, org.springframework.http.HttpStatus.BAD_REQUEST);
     }
-
 }

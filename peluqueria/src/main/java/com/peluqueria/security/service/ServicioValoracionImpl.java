@@ -22,30 +22,47 @@ public class ServicioValoracionImpl implements ServicioValoracion {
     private CitaRepository citaRepository;
 
     @Override
-    public Valoracion crearValoracion(Valoracion valoracion, Long idCita) {
+    public Valoracion crearValoracion(Valoracion valoracion, Long idCita, Long idCliente) {
         Cita cita = citaRepository.findById(idCita)
                 .orElseThrow(() -> new CitaException("Cita no encontrada"));
 
-        valoracion.setCita(cita);
-        if (valoracion.getFechaValoracion() == null) {
-            valoracion.setFechaValoracion(LocalDateTime.now());
+        // VALIDACIÓN 1: ¿La cita pertenece al cliente logueado? (Seguridad)
+        if (!cita.getCliente().getId().equals(idCliente)) {
+            throw new ValoracionException("No tienes permiso para valorar una cita que no te pertenece.");
         }
 
-        // VALIDACIÓN: Verificar si ya existe una valoración para esta cita
+        // VALIDACIÓN 2: ¿La cita está cancelada? (Lógica de negocio)
+        if ("CANCELADA".equalsIgnoreCase(cita.getEstado())) {
+            throw new ValoracionException("No se puede valorar una cita que ha sido cancelada.");
+        }
+
+        // VALIDACIÓN 3: ¿Ya existe una valoración para esta cita? (Integridad)
         List<Valoracion> existentes = valoracionRepository.findByCita(cita);
         if (!existentes.isEmpty()) {
             throw new ValoracionException("Esta cita ya ha sido valorada.");
         }
 
+        // Validación de rango de puntuación
         if (valoracion.getPuntuacion() < 1 || valoracion.getPuntuacion() > 5) {
             throw new IllegalArgumentException("La puntuación debe estar entre 1 y 5");
         }
 
-        // Actualizar estado de la cita a COMPLETADA
+        // Seteamos datos automáticos
+        valoracion.setCita(cita);
+        if (valoracion.getFechaValoracion() == null) {
+            valoracion.setFechaValoracion(LocalDateTime.now());
+        }
+
+        // Al valorar, marcamos la cita como COMPLETADA automáticamente
         cita.setEstado("COMPLETADA");
         citaRepository.save(cita);
 
         return valoracionRepository.save(valoracion);
+    }
+
+    @Override
+    public Valoracion crearValoracion(Valoracion valoracion, Long idCita) {
+        return null;
     }
 
     @Override
