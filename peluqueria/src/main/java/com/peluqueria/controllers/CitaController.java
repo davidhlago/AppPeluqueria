@@ -2,13 +2,14 @@ package com.peluqueria.controllers;
 
 import com.peluqueria.entity.Cita;
 import com.peluqueria.exception.CitaException;
-import com.peluqueria.exception.HorarioException;
 import com.peluqueria.security.service.ServicioCita;
+import com.peluqueria.security.service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -32,15 +33,39 @@ public class CitaController {
 
     @GetMapping("/cliente/{clienteId}")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
-    public ResponseEntity<List<Cita>> listarCitasCliente(@PathVariable Long clienteId) {
+    public ResponseEntity<?> listarCitasCliente(@PathVariable Long clienteId, Authentication authentication) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Long idLogueado = userDetails.getId();
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+
+        // VALIDACIÓN DE SEGURIDAD: Un cliente solo ve lo suyo
+        if (!isAdmin && !idLogueado.equals(clienteId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("{\"error\": \"No tienes permiso para ver las citas de otro cliente.\"}");
+        }
+
         return ResponseEntity.ok(citaService.obtenerPorCliente(clienteId));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getCitaById(@PathVariable long id) {
+    public ResponseEntity<?> getCitaById(@PathVariable long id, Authentication authentication) {
         try {
             Cita cita = citaService.obtenerPorId(id);
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            Long idLogueado = userDetails.getId();
+
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+
+            // VALIDACIÓN: Si no es admin y la cita no le pertenece, 403
+            if (!isAdmin && !cita.getCliente().getId().equals(idLogueado)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("{\"error\": \"Acceso denegado a esta cita.\"}");
+            }
+
             return ResponseEntity.ok(cita);
         } catch (CitaException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -54,7 +79,7 @@ public class CitaController {
         return ResponseEntity.ok(citaService.obtenerHuecosPorServicioYFecha(idServicio, fecha));
     }
 
-    // --- MÉTODOS DE ESCRITURA (POST/PUT/DELETE) ---
+    // --- MÉTODOS DE ESCRITURA ---
 
     @PostMapping("/reservar")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
@@ -63,7 +88,6 @@ public class CitaController {
         return new ResponseEntity<>(added, HttpStatus.CREATED);
     }
 
-    // ✅ MÉTODO ESPECÍFICO PARA CANCELAR DESDE LA APP (PUT)
     @PutMapping("/{id}/cancelar")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
     public ResponseEntity<?> cancelarCitaPorCliente(@PathVariable Long id) {
@@ -83,56 +107,7 @@ public class CitaController {
             return ResponseEntity.ok(citaActualizada);
         } catch (CitaException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno");
         }
-    }
-
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
-    public ResponseEntity<?> editarCita(@PathVariable Long id, @RequestBody Cita cita) {
-        Cita actualizado = citaService.modificarCita(id, cita);
-        return ResponseEntity.ok(actualizado);
-    }
-
-    @ExceptionHandler(com.peluqueria.exception.HorarioException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<com.peluqueria.advice.ErrorMessage> handleHorarioException(
-            com.peluqueria.exception.HorarioException ex, org.springframework.web.context.request.WebRequest request) {
-        com.peluqueria.advice.ErrorMessage message = new com.peluqueria.advice.ErrorMessage(
-                HttpStatus.BAD_REQUEST.value(),
-                new java.util.Date(),
-                ex.getMessage(),
-                request.getDescription(false));
-
-        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(com.peluqueria.exception.CitaException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<com.peluqueria.advice.ErrorMessage> handleCitaException(
-            com.peluqueria.exception.CitaException ex, org.springframework.web.context.request.WebRequest request) {
-        com.peluqueria.advice.ErrorMessage message = new com.peluqueria.advice.ErrorMessage(
-                HttpStatus.BAD_REQUEST.value(),
-                new java.util.Date(),
-                ex.getMessage(),
-                request.getDescription(false));
-
-        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(com.peluqueria.exception.BloqueoHorarioException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<com.peluqueria.advice.ErrorMessage> handleBloqueoHorarioException(
-            com.peluqueria.exception.BloqueoHorarioException ex,
-            org.springframework.web.context.request.WebRequest request) {
-        com.peluqueria.advice.ErrorMessage message = new com.peluqueria.advice.ErrorMessage(
-                HttpStatus.BAD_REQUEST.value(),
-                new java.util.Date(),
-                ex.getMessage(),
-                request.getDescription(false));
-
-        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
 
     @DeleteMapping("/{id}")
@@ -149,5 +124,17 @@ public class CitaController {
     @GetMapping("/dias-disponibles")
     public ResponseEntity<List<Integer>> getDiasLaborables(@RequestParam Long idServicio) {
         return ResponseEntity.ok(citaService.obtenerDiasLaborablesPorServicio(idServicio));
+    }
+
+    // --- MANEJO DE EXCEPCIONES ---
+
+    @ExceptionHandler(com.peluqueria.exception.HorarioException.class)
+    public ResponseEntity<?> handleHorarioException(com.peluqueria.exception.HorarioException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(com.peluqueria.exception.CitaException.class)
+    public ResponseEntity<?> handleCitaException(com.peluqueria.exception.CitaException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
 }
