@@ -26,6 +26,9 @@ public class ServicioBloqueoHorarioImpl implements ServicioBloqueoHorario {
     @Autowired
     private ServicioRepository servicioRepository;
 
+    @Autowired
+    private com.peluqueria.repository.CitaRepository citaRepository;
+
     @Override
     @Transactional
     public BloqueoHorario crearBloqueo(BloqueoHorario bloqueo) {
@@ -45,6 +48,34 @@ public class ServicioBloqueoHorarioImpl implements ServicioBloqueoHorario {
             // Si es todo el día, limpiamos las horas
             bloqueo.setHoraInicio(null);
             bloqueo.setHoraFin(null);
+        }
+
+        // 1. Validar conflictos con otros bloqueos
+        List<BloqueoHorario> conflictos = bloqueoRepository.findConflictos(
+                bloqueo.getFecha(),
+                bloqueo.getGrupo() != null ? bloqueo.getGrupo().getId() : null,
+                bloqueo.getServicio() != null ? bloqueo.getServicio().getIdServicio() : null,
+                bloqueo.getHoraInicio(),
+                bloqueo.getHoraFin());
+
+        if (!conflictos.isEmpty()) {
+            BloqueoHorario existente = conflictos.get(0);
+            throw new com.peluqueria.exception.BloqueoHorarioException(
+                    "Ya existe un bloqueo para esa fecha/hora. Motivo: " + existente.getMotivo());
+        }
+
+        // 2. Validar conflictos con Citas existentes
+        List<com.peluqueria.entity.Cita> citasConflictivas = citaRepository.findCitasParaBloqueo(
+                bloqueo.getFecha(),
+                bloqueo.getGrupo() != null ? bloqueo.getGrupo().getId() : null,
+                bloqueo.getServicio() != null ? bloqueo.getServicio().getIdServicio() : null,
+                bloqueo.getHoraInicio(),
+                bloqueo.getHoraFin());
+
+        if (!citasConflictivas.isEmpty()) {
+            throw new com.peluqueria.exception.BloqueoHorarioException(
+                    "No se puede bloquear: Existen " + citasConflictivas.size()
+                            + " cita(s) programada(s) en ese horario.");
         }
 
         // Asignar entidades reales (Evita TransientObjectException)
@@ -95,7 +126,7 @@ public class ServicioBloqueoHorarioImpl implements ServicioBloqueoHorario {
     @Override
     public boolean existeConflicto(LocalDate fecha, Long idGrupo, Long idServicio,
             LocalTime horaInicio, LocalTime horaFin) {
-        return bloqueoRepository.existeBloqueo(fecha, idGrupo, idServicio, horaInicio, horaFin);
+        return !bloqueoRepository.findConflictos(fecha, idGrupo, idServicio, horaInicio, horaFin).isEmpty();
     }
 
     @Override
@@ -148,7 +179,8 @@ public class ServicioBloqueoHorarioImpl implements ServicioBloqueoHorario {
                     .orElseThrow(() -> new RuntimeException("Grupo no encontrado"));
             actual.setGrupo(g);
         } else {
-            // Si viene null, significa que ahora es un bloqueo GLOBAL (para todos los grupos)
+            // Si viene null, significa que ahora es un bloqueo GLOBAL (para todos los
+            // grupos)
             actual.setGrupo(null);
         }
 

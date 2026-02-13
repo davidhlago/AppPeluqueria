@@ -80,35 +80,37 @@ public class BloqueoHorarioController {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> crearBloqueo(@RequestBody BloqueoHorario bloqueo) {
-        try {
-            BloqueoHorario nuevo = servicioBloqueo.crearBloqueo(bloqueo);
-            return ResponseEntity.ok(nuevo);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        BloqueoHorario nuevo = servicioBloqueo.crearBloqueo(bloqueo);
+        return ResponseEntity.ok(nuevo);
     }
 
     // DELETE - Eliminar bloqueo (solo ADMIN)
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> eliminarBloqueo(@PathVariable Long id) {
-        try {
-            servicioBloqueo.eliminarBloqueo(id);
-            return ResponseEntity.ok("Bloqueo eliminado correctamente");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        servicioBloqueo.eliminarBloqueo(id);
+        return ResponseEntity.ok("Bloqueo eliminado correctamente");
     }
 
-    //editar
+    // editar
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> actualizarBloqueo(@PathVariable Long id, @RequestBody BloqueoHorario bloqueoDetails) {
-        try {
-            BloqueoHorario actualizado = servicioBloqueo.actualizarBloqueo(id, bloqueoDetails);
-            return ResponseEntity.ok(actualizado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        BloqueoHorario actualizado = servicioBloqueo.actualizarBloqueo(id, bloqueoDetails);
+        return ResponseEntity.ok(actualizado);
+    }
+
+    @ExceptionHandler(com.peluqueria.exception.BloqueoHorarioException.class)
+    @ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
+    public ResponseEntity<com.peluqueria.advice.ErrorMessage> handleBloqueoHorarioException(
+            com.peluqueria.exception.BloqueoHorarioException ex,
+            org.springframework.web.context.request.WebRequest request) {
+        com.peluqueria.advice.ErrorMessage message = new com.peluqueria.advice.ErrorMessage(
+                org.springframework.http.HttpStatus.BAD_REQUEST.value(),
+                new java.util.Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+
+        return new ResponseEntity<>(message, org.springframework.http.HttpStatus.BAD_REQUEST);
     }
 }

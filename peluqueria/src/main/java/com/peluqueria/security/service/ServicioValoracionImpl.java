@@ -3,6 +3,7 @@ package com.peluqueria.security.service;
 import com.peluqueria.entity.Cita;
 import com.peluqueria.entity.Valoracion;
 import com.peluqueria.exception.CitaException;
+import com.peluqueria.exception.ValoracionException;
 import com.peluqueria.repository.CitaRepository;
 import com.peluqueria.repository.ValoracionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,12 @@ public class ServicioValoracionImpl implements ServicioValoracion {
         valoracion.setCita(cita);
         if (valoracion.getFechaValoracion() == null) {
             valoracion.setFechaValoracion(LocalDateTime.now());
+        }
+
+        // VALIDACIÓN: Verificar si ya existe una valoración para esta cita
+        List<Valoracion> existentes = valoracionRepository.findByCita(cita);
+        if (!existentes.isEmpty()) {
+            throw new ValoracionException("Esta cita ya ha sido valorada.");
         }
 
         if (valoracion.getPuntuacion() < 1 || valoracion.getPuntuacion() > 5) {

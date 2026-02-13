@@ -34,7 +34,7 @@ public class ValoracionController {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         Long idCliente = userDetails.getId(); // por si lo necesitas en el servicio
 
-        Valoracion creada = servicioValoracion.crearValoracion(valoracion, idCita /*, idCliente */);
+        Valoracion creada = servicioValoracion.crearValoracion(valoracion, idCita /* , idCliente */);
         return ResponseEntity.status(201).body(creada);
     }
 
@@ -45,8 +45,7 @@ public class ValoracionController {
             @PathVariable Long idValoracion,
             @RequestBody Valoracion valoracion) {
 
-        Valoracion actualizada =
-                servicioValoracion.actualizarValoracion(idValoracion, valoracion);
+        Valoracion actualizada = servicioValoracion.actualizarValoracion(idValoracion, valoracion);
         return ResponseEntity.ok(actualizada);
     }
 
@@ -76,6 +75,20 @@ public class ValoracionController {
     public ResponseEntity<Double> mediaPorServicio(@PathVariable Long idServicio) {
         Double media = valoracionRepository.mediaPuntuacionPorServicio(idServicio);
         return ResponseEntity.ok(media != null ? media : 0.0);
+    }
+
+    @ExceptionHandler(com.peluqueria.exception.ValoracionException.class)
+    @ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
+    public ResponseEntity<com.peluqueria.advice.ErrorMessage> handleValoracionException(
+            com.peluqueria.exception.ValoracionException ex,
+            org.springframework.web.context.request.WebRequest request) {
+        com.peluqueria.advice.ErrorMessage message = new com.peluqueria.advice.ErrorMessage(
+                org.springframework.http.HttpStatus.BAD_REQUEST.value(),
+                new java.util.Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+
+        return new ResponseEntity<>(message, org.springframework.http.HttpStatus.BAD_REQUEST);
     }
 
 }

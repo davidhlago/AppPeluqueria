@@ -13,29 +13,29 @@ import java.util.List;
 @Repository
 public interface BloqueoHorarioRepository extends JpaRepository<BloqueoHorario, Long> {
 
-    List<BloqueoHorario> findByFecha(LocalDate fecha);
+        List<BloqueoHorario> findByFecha(LocalDate fecha);
 
-    List<BloqueoHorario> findByGrupoId(Long idGrupo);
+        List<BloqueoHorario> findByGrupoId(Long idGrupo);
 
-    List<BloqueoHorario> findByServicioIdServicio(Long idServicio);
+        List<BloqueoHorario> findByServicioIdServicio(Long idServicio);
 
-    List<BloqueoHorario> findByFechaAndGrupoId(LocalDate fecha, Long idGrupo);
+        List<BloqueoHorario> findByFechaAndGrupoId(LocalDate fecha, Long idGrupo);
 
-    List<BloqueoHorario> findByFechaAndServicioIdServicio(LocalDate fecha, Long idServicio);
+        List<BloqueoHorario> findByFechaAndServicioIdServicio(LocalDate fecha, Long idServicio);
 
-    // Consulta Maestra para detectar conflictos
-    @Query("SELECT COUNT(b) > 0 FROM BloqueoHorario b WHERE " +
-            "b.fecha = :fecha " +
-            "AND (b.grupo IS NULL OR b.grupo.id = :idGrupo) " +
-            "AND (b.servicio IS NULL OR b.servicio.idServicio = :idServicio) " +
-            "AND (b.todoElDia = true OR " +
-            "    (:horaFinCita > b.horaInicio AND :horaInicioCita < b.horaFin))")
-    boolean existeBloqueo(@Param("fecha") LocalDate fecha,
-            @Param("idGrupo") Long idGrupo,
-            @Param("idServicio") Long idServicio,
-            @Param("horaInicioCita") LocalTime horaInicioCita,
-            @Param("horaFinCita") LocalTime horaFinCita);
+        // Consulta Maestra para detectar conflictos
+        @Query("SELECT b FROM BloqueoHorario b WHERE " +
+                        "b.fecha = :fecha " +
+                        "AND (b.grupo IS NULL OR b.grupo.id = :idGrupo) " +
+                        "AND (b.servicio IS NULL OR b.servicio.idServicio = :idServicio) " +
+                        "AND (b.todoElDia = true OR " +
+                        "    (:horaFinCita > b.horaInicio AND :horaInicioCita < b.horaFin))")
+        List<BloqueoHorario> findConflictos(@Param("fecha") LocalDate fecha,
+                        @Param("idGrupo") Long idGrupo,
+                        @Param("idServicio") Long idServicio,
+                        @Param("horaInicioCita") LocalTime horaInicioCita,
+                        @Param("horaFinCita") LocalTime horaFinCita);
 
-    // Buscar bloqueos activos entre dos fechas
-    List<BloqueoHorario> findByFechaBetween(LocalDate fechaInicio, LocalDate fechaFin);
+        // Buscar bloqueos activos entre dos fechas
+        List<BloqueoHorario> findByFechaBetween(LocalDate fechaInicio, LocalDate fechaFin);
 }

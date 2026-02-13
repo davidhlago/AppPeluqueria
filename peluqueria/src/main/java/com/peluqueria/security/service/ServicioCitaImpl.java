@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +65,13 @@ public class ServicioCitaImpl implements ServicioCita {
         // 4. Calcular horas
         Servicio servicio = horario.getServicio();
         LocalTime inicioSolicitado = citaIncoming.getHoraInicio();
-        if (inicioSolicitado == null) throw new CitaException("Debe indicar hora de inicio");
+        if (inicioSolicitado == null)
+            throw new CitaException("Debe indicar hora de inicio");
+
+        // VALIDACIÓN DE FECHA PASADA (NUEVO)
+        if (LocalDateTime.of(citaIncoming.getFecha(), inicioSolicitado).isBefore(LocalDateTime.now())) {
+            throw new HorarioException("No se pueden reservar citas en el pasado.");
+        }
 
         int duracionMinutos = (servicio.getDuracionBloques() > 0)
                 ? servicio.getDuracionBloques() * MINUTOS_POR_BLOQUE
@@ -78,20 +85,21 @@ public class ServicioCitaImpl implements ServicioCita {
         }
 
         // ✅ 6. VALIDAR BLOQUEOS (NUEVO)
-        boolean estaBloqueado = bloqueoRepository.existeBloqueo(
+        List<com.peluqueria.entity.BloqueoHorario> bloqueos = bloqueoRepository.findConflictos(
                 citaIncoming.getFecha(),
                 horario.getGrupo().getId(),
                 servicio.getIdServicio(),
                 inicioSolicitado,
-                finSolicitado
-        );
+                finSolicitado);
 
-        if (estaBloqueado) {
-            throw new HorarioException("No se puede reservar: El horario está BLOQUEADO por el administrador.");
+        if (!bloqueos.isEmpty()) {
+            throw new com.peluqueria.exception.BloqueoHorarioException(
+                    "No se puede reservar: El horario está BLOQUEADO. Motivo: " + bloqueos.get(0).getMotivo());
         }
 
         // 7. Validar Cupo
-        long citasSimultaneas = citaRepository.countCitasConflictivas(horario, citaIncoming.getFecha(), inicioSolicitado, finSolicitado);
+        long citasSimultaneas = citaRepository.countCitasConflictivas(horario, citaIncoming.getFecha(),
+                inicioSolicitado, finSolicitado);
         if (citasSimultaneas >= horario.getCupoMaximo()) {
             throw new CitaException("No hay hueco disponible. El cupo está completo para ese tramo horario.");
         }
@@ -108,8 +116,10 @@ public class ServicioCitaImpl implements ServicioCita {
 
     @Override
     public List<LocalTime> obtenerHuecosDisponibles(LocalDate fecha, Long idHorarioSemana, Long idGrupoIgnorado) {
-        // Implementación básica (si la usas, deberías añadir la lógica de bloqueo aquí también)
-        // Por ahora lo dejo como estaba para no romper nada, pero lo ideal es usar el método de abajo.
+        // Implementación básica (si la usas, deberías añadir la lógica de bloqueo aquí
+        // también)
+        // Por ahora lo dejo como estaba para no romper nada, pero lo ideal es usar el
+        // método de abajo.
         return new ArrayList<>();
     }
 
@@ -123,7 +133,8 @@ public class ServicioCitaImpl implements ServicioCita {
 
         for (HorarioSemanal horario : horarios) {
             Servicio servicio = horario.getServicio();
-            if (servicio == null) continue;
+            if (servicio == null)
+                continue;
 
             int duracionMinutos = (servicio.getDuracionBloques() > 0)
                     ? servicio.getDuracionBloques() * MINUTOS_POR_BLOQUE
@@ -136,16 +147,15 @@ public class ServicioCitaImpl implements ServicioCita {
                 LocalTime finBloque = horaActual.plusMinutes(duracionMinutos);
 
                 // ✅ VALIDAR BLOQUEO ANTES DE AÑADIR EL HUECO
-                boolean estaBloqueado = bloqueoRepository.existeBloqueo(
+                List<com.peluqueria.entity.BloqueoHorario> bloqueos = bloqueoRepository.findConflictos(
                         fecha,
                         horario.getGrupo().getId(),
                         servicio.getIdServicio(),
                         horaActual,
-                        finBloque
-                );
+                        finBloque);
 
                 // Solo procesamos si NO está bloqueado
-                if (!estaBloqueado) {
+                if (bloqueos.isEmpty()) {
                     long conflictos = citaRepository.countCitasConflictivas(horario, fecha, horaActual, finBloque);
 
                     if (conflictos < horario.getCupoMaximo()) {
@@ -154,8 +164,7 @@ public class ServicioCitaImpl implements ServicioCita {
                         huecosDisponibles.add(Map.of(
                                 "hora", horaActual.toString(),
                                 "idHorario", horario.getIdHorarioSemana(),
-                                "plazasRestantes", plazasRestantes
-                        ));
+                                "plazasRestantes", plazasRestantes));
                     }
                 }
 
@@ -171,7 +180,8 @@ public class ServicioCitaImpl implements ServicioCita {
 
         // Si cambia la fecha o la hora, deberíamos validar bloqueos de nuevo
         // Por simplicidad, solo actualizamos fecha aquí, pero tenlo en cuenta
-        if (citaDetalles.getFecha() != null) cita.setFecha(citaDetalles.getFecha());
+        if (citaDetalles.getFecha() != null)
+            cita.setFecha(citaDetalles.getFecha());
 
         return citaRepository.save(cita);
     }
@@ -179,14 +189,19 @@ public class ServicioCitaImpl implements ServicioCita {
     @Override
     public Cita gestionarEstadoCita(Long idCita, int opcion) {
         Cita cita = obtenerPorId(idCita);
-        if (opcion == 0) cita.setEstado("CONFIRMADA");
-        else if (opcion == 1) cita.setEstado("CANCELADA");
-        else throw new CitaException("Estado no válido");
+        if (opcion == 0)
+            cita.setEstado("CONFIRMADA");
+        else if (opcion == 1)
+            cita.setEstado("CANCELADA");
+        else
+            throw new CitaException("Estado no válido");
         return citaRepository.save(cita);
     }
 
     @Override
-    public void cancelarCita(Long id) { gestionarEstadoCita(id, 1); }
+    public void cancelarCita(Long id) {
+        gestionarEstadoCita(id, 1);
+    }
 
     @Override
     public Cita obtenerPorId(Long id) {
@@ -194,27 +209,43 @@ public class ServicioCitaImpl implements ServicioCita {
     }
 
     @Override
-    public List<Cita> obtenerTodas() { return citaRepository.findAll(); }
+    public List<Cita> obtenerTodas() {
+        return citaRepository.findAll();
+    }
 
     @Override
-    public List<Cita> obtenerPorCliente(Long id) { return citaRepository.findByCliente_Id(id); }
+    public List<Cita> obtenerPorCliente(Long id) {
+        return citaRepository.findByCliente_Id(id);
+    }
 
     @Override
-    public List<Cita> obtenerPorGrupo(Long id) { return citaRepository.findByGrupo_Id(id); }
+    public List<Cita> obtenerPorGrupo(Long id) {
+        return citaRepository.findByGrupo_Id(id);
+    }
 
     @Override
-    public List<Cita> obtenerPorAlumno(Long id) { return new ArrayList<>(); }
+    public List<Cita> obtenerPorAlumno(Long id) {
+        return new ArrayList<>();
+    }
 
     private String traducirDia(DayOfWeek dia) {
         switch (dia) {
-            case MONDAY: return "Lunes";
-            case TUESDAY: return "Martes";
-            case WEDNESDAY: return "Miércoles";
-            case THURSDAY: return "Jueves";
-            case FRIDAY: return "Viernes";
-            case SATURDAY: return "Sábado";
-            case SUNDAY: return "Domingo";
-            default: return "";
+            case MONDAY:
+                return "Lunes";
+            case TUESDAY:
+                return "Martes";
+            case WEDNESDAY:
+                return "Miércoles";
+            case THURSDAY:
+                return "Jueves";
+            case FRIDAY:
+                return "Viernes";
+            case SATURDAY:
+                return "Sábado";
+            case SUNDAY:
+                return "Domingo";
+            default:
+                return "";
         }
     }
 
@@ -229,19 +260,28 @@ public class ServicioCitaImpl implements ServicioCita {
     }
 
     private int convertirDiaANumero(String dia) {
-        if (dia == null) return 0;
+        if (dia == null)
+            return 0;
         String d = dia.toUpperCase().trim()
                 .replace("Á", "A").replace("É", "E")
                 .replace("Í", "I").replace("Ó", "O").replace("Ú", "U");
         switch (d) {
-            case "LUNES": return 1;
-            case "MARTES": return 2;
-            case "MIERCOLES": return 3;
-            case "JUEVES": return 4;
-            case "VIERNES": return 5;
-            case "SABADO": return 6;
-            case "DOMINGO": return 7;
-            default: return 0;
+            case "LUNES":
+                return 1;
+            case "MARTES":
+                return 2;
+            case "MIERCOLES":
+                return 3;
+            case "JUEVES":
+                return 4;
+            case "VIERNES":
+                return 5;
+            case "SABADO":
+                return 6;
+            case "DOMINGO":
+                return 7;
+            default:
+                return 0;
         }
     }
 }

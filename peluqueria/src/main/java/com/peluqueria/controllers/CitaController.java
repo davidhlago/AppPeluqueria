@@ -59,14 +59,8 @@ public class CitaController {
     @PostMapping("/reservar")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
     public ResponseEntity<?> addCita(@RequestBody Cita cita) {
-        try {
-            Cita added = citaService.crearCita(cita);
-            return new ResponseEntity<>(added, HttpStatus.CREATED);
-        } catch (HorarioException | CitaException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno: " + e.getMessage());
-        }
+        Cita added = citaService.crearCita(cita);
+        return new ResponseEntity<>(added, HttpStatus.CREATED);
     }
 
     // ✅ MÉTODO ESPECÍFICO PARA CANCELAR DESDE LA APP (PUT)
@@ -97,12 +91,48 @@ public class CitaController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
     public ResponseEntity<?> editarCita(@PathVariable Long id, @RequestBody Cita cita) {
-        try {
-            Cita citaEditada = citaService.modificarCita(id, cita);
-            return ResponseEntity.ok(citaEditada);
-        } catch (CitaException | HorarioException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        Cita actualizado = citaService.modificarCita(id, cita);
+        return ResponseEntity.ok(actualizado);
+    }
+
+    @ExceptionHandler(com.peluqueria.exception.HorarioException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<com.peluqueria.advice.ErrorMessage> handleHorarioException(
+            com.peluqueria.exception.HorarioException ex, org.springframework.web.context.request.WebRequest request) {
+        com.peluqueria.advice.ErrorMessage message = new com.peluqueria.advice.ErrorMessage(
+                HttpStatus.BAD_REQUEST.value(),
+                new java.util.Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(com.peluqueria.exception.CitaException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<com.peluqueria.advice.ErrorMessage> handleCitaException(
+            com.peluqueria.exception.CitaException ex, org.springframework.web.context.request.WebRequest request) {
+        com.peluqueria.advice.ErrorMessage message = new com.peluqueria.advice.ErrorMessage(
+                HttpStatus.BAD_REQUEST.value(),
+                new java.util.Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(com.peluqueria.exception.BloqueoHorarioException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<com.peluqueria.advice.ErrorMessage> handleBloqueoHorarioException(
+            com.peluqueria.exception.BloqueoHorarioException ex,
+            org.springframework.web.context.request.WebRequest request) {
+        com.peluqueria.advice.ErrorMessage message = new com.peluqueria.advice.ErrorMessage(
+                HttpStatus.BAD_REQUEST.value(),
+                new java.util.Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
 
     @DeleteMapping("/{id}")

@@ -15,6 +15,7 @@ import java.util.List;
 public interface CitaRepository extends JpaRepository<Cita, Long> {
 
     List<Cita> findByCliente_Id(Long idCliente);
+
     List<Cita> findByGrupo_Id(Long idGrupo);
 
     // CAMBIO AQUÍ:
@@ -25,10 +26,22 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             @Param("horario") HorarioSemanal horario,
             @Param("fecha") LocalDate fecha,
             @Param("horaInicio") LocalTime horaInicio,
-            @Param("horaFin") LocalTime horaFin
-    );
+            @Param("horaFin") LocalTime horaFin);
+
     @Query("SELECT COUNT(c) FROM Cita c WHERE c.horarioSemanal.idHorarioSemana = :idHorario AND c.fecha = :fecha AND c.horaInicio = :horaInicio AND c.estado != 'CANCELADA'")
 
-    int contarCitas(@Param("idHorario") Long idHorario, @Param("fecha") LocalDate fecha, @Param("horaInicio") LocalTime horaInicio);
+    int contarCitas(@Param("idHorario") Long idHorario, @Param("fecha") LocalDate fecha,
+            @Param("horaInicio") LocalTime horaInicio);
+
+    @Query("SELECT c FROM Cita c WHERE c.fecha = :fecha AND c.estado <> 'CANCELADA' " +
+            "AND (:idGrupo IS NULL OR c.grupo.id = :idGrupo) " +
+            "AND (:idServicio IS NULL OR c.horarioSemanal.servicio.idServicio = :idServicio) " +
+            "AND (:horaInicio IS NULL OR :horaFin IS NULL OR (c.horaInicio < :horaFin AND c.horaFin > :horaInicio))")
+    List<Cita> findCitasParaBloqueo(
+            @Param("fecha") LocalDate fecha,
+            @Param("idGrupo") Long idGrupo,
+            @Param("idServicio") Long idServicio,
+            @Param("horaInicio") LocalTime horaInicio,
+            @Param("horaFin") LocalTime horaFin);
 
 }
