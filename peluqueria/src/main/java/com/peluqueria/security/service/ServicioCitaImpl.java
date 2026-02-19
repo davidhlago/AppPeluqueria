@@ -182,6 +182,16 @@ public class ServicioCitaImpl implements ServicioCita {
         // Por simplicidad, solo actualizamos fecha aquí, pero tenlo en cuenta
         if (citaDetalles.getFecha() != null)
             cita.setFecha(citaDetalles.getFecha());
+        if (citaDetalles.getHoraInicio() != null)
+            cita.setHoraInicio(citaDetalles.getHoraInicio());
+        if (citaDetalles.getHoraFin() != null)
+            cita.setHoraFin(citaDetalles.getHoraFin());
+        if (citaDetalles.getHorarioSemanal() != null)
+            cita.setHorarioSemanal(citaDetalles.getHorarioSemanal());
+        if (citaDetalles.getGrupo() != null)
+            cita.setGrupo(citaDetalles.getGrupo());
+        if (citaDetalles.getEstado() != null)
+            cita.setEstado(citaDetalles.getEstado());
 
         return citaRepository.save(cita);
     }
@@ -193,6 +203,8 @@ public class ServicioCitaImpl implements ServicioCita {
             cita.setEstado("CONFIRMADA");
         else if (opcion == 1)
             cita.setEstado("CANCELADA");
+        else if (opcion == 2)
+            cita.setEstado("COMPLETADA");
         else
             throw new CitaException("Estado no válido");
         return citaRepository.save(cita);

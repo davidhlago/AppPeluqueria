@@ -43,9 +43,11 @@ public class ServicioValoracionImpl implements ServicioValoracion {
         }
 
         // Validación de rango de puntuación
-        if (valoracion.getPuntuacion() < 1 || valoracion.getPuntuacion() > 5) {
-            throw new IllegalArgumentException("La puntuación debe estar entre 1 y 5");
-        }
+        validarPuntuacion(valoracion.getTratoPersonal(), "Trato Personal");
+        validarPuntuacion(valoracion.getDesarrolloServicio(), "Desarrollo del Servicio");
+        validarPuntuacion(valoracion.getClaridadComunicacion(), "Claridad en la Comunicación");
+        validarPuntuacion(valoracion.getLimpiezaOrganizacion(), "Limpieza y Organización");
+        validarPuntuacion(valoracion.getGeneral(), "General");
 
         // Seteamos datos automáticos
         valoracion.setCita(cita);
@@ -70,8 +72,20 @@ public class ServicioValoracionImpl implements ServicioValoracion {
         Valoracion existente = valoracionRepository.findById(idValoracion)
                 .orElseThrow(() -> new RuntimeException("Valoración no encontrada"));
 
-        if (datos.getPuntuacion() >= 1 && datos.getPuntuacion() <= 5) {
-            existente.setPuntuacion(datos.getPuntuacion());
+        if (datos.getTratoPersonal() >= 1.0 && datos.getTratoPersonal() <= 5.0) {
+            existente.setTratoPersonal(datos.getTratoPersonal());
+        }
+        if (datos.getDesarrolloServicio() >= 1.0 && datos.getDesarrolloServicio() <= 5.0) {
+            existente.setDesarrolloServicio(datos.getDesarrolloServicio());
+        }
+        if (datos.getClaridadComunicacion() >= 1.0 && datos.getClaridadComunicacion() <= 5.0) {
+            existente.setClaridadComunicacion(datos.getClaridadComunicacion());
+        }
+        if (datos.getLimpiezaOrganizacion() >= 1.0 && datos.getLimpiezaOrganizacion() <= 5.0) {
+            existente.setLimpiezaOrganizacion(datos.getLimpiezaOrganizacion());
+        }
+        if (datos.getGeneral() >= 1.0 && datos.getGeneral() <= 5.0) {
+            existente.setGeneral(datos.getGeneral());
         }
         if (datos.getComentario() != null) {
             existente.setComentario(datos.getComentario());
@@ -104,5 +118,11 @@ public class ServicioValoracionImpl implements ServicioValoracion {
     @Override
     public List<Valoracion> obtenerTodas() {
         return valoracionRepository.findAll();
+    }
+
+    private void validarPuntuacion(double puntuacion, String campo) {
+        if (puntuacion < 1.0 || puntuacion > 5.0) {
+            throw new IllegalArgumentException("La puntuación de " + campo + " debe estar entre 1.0 y 5.0");
+        }
     }
 }

@@ -110,6 +110,18 @@ public class CitaController {
         }
     }
 
+    // --- NUEVO ENDPOINT PARA EDITAR CITA COMPLETA ---
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
+    public ResponseEntity<?> updateCita(@PathVariable long id, @RequestBody Cita cita) {
+        try {
+            Cita updated = citaService.modificarCita(id, cita);
+            return ResponseEntity.ok(updated);
+        } catch (CitaException | com.peluqueria.exception.HorarioException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
     public ResponseEntity<?> deleteCita(@PathVariable long id) {
