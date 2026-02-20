@@ -23,7 +23,7 @@ public interface BloqueoHorarioRepository extends JpaRepository<BloqueoHorario, 
 
         List<BloqueoHorario> findByFechaAndServicioIdServicio(LocalDate fecha, Long idServicio);
 
-        // Consulta Maestra para detectar conflictos
+        // Consulta para detectar conflictos
         @Query("SELECT b FROM BloqueoHorario b WHERE " +
                         "b.fecha = :fecha " +
                         "AND (b.grupo IS NULL OR b.grupo.id = :idGrupo) " +

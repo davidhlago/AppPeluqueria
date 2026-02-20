@@ -25,7 +25,7 @@ public class GrupoController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO') or hasAuthority('PROFESOR')")
     public List<Grupo> obtenerTodosLosGrupos(Authentication authentication) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
