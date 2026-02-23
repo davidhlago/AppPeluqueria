@@ -19,6 +19,7 @@ import com.peluqueria.security.service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -49,10 +50,10 @@ public class AuthController {
     private String googleClientId;
 
     public AuthController(AuthenticationManager authenticationManager,
-                          UsuarioRepository usuarioRepository,
-                          PasswordEncoder passwordEncoder,
-                          JwtUtils jwtUtils,
-                          ServicioEmail emailService) {
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder,
+            JwtUtils jwtUtils,
+            ServicioEmail emailService) {
         this.authenticationManager = authenticationManager;
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
@@ -67,9 +68,7 @@ public class AuthController {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsername(),
-                            loginRequest.getPassword()
-                    )
-            );
+                            loginRequest.getPassword()));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -87,8 +86,7 @@ public class AuthController {
                     userDetails.getNombre(),
                     userDetails.getApellidos(),
                     userDetails.getUsername(),
-                    rol
-            ));
+                    rol));
         } catch (BadCredentialsException ex) {
             return ResponseEntity.status(401)
                     .body(new MessageResponse("Error: El usuario o contraseña introducidos son incorrectos."));
@@ -138,6 +136,7 @@ public class AuthController {
 
     // ---------------- SIGN UP (REGISTRO) ----------------
     @PostMapping("/signup/cliente")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
     public ResponseEntity<?> crearCliente(@Valid @RequestBody Cliente cliente) {
         if (usuarioRepository.findByUsername(cliente.getUsername()) != null) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Usuario en uso."));
@@ -149,6 +148,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup/admin")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
     public ResponseEntity<?> crearAdmin(@Valid @RequestBody Admin admin) {
         if (usuarioRepository.findByUsername(admin.getUsername()) != null) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Usuario en uso."));
@@ -160,6 +160,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup/grupo")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
     public ResponseEntity<?> crearGrupo(@Valid @RequestBody Grupo grupo) {
         if (usuarioRepository.findByUsername(grupo.getUsername()) != null) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Usuario en uso."));

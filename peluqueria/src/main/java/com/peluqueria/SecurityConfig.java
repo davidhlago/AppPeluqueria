@@ -24,8 +24,8 @@ public class SecurityConfig {
     private final AuthTokenFilter authTokenFilter;
 
     public SecurityConfig(UserDetailsServiceImpl userDetailsService,
-                          AuthEntryPointJwt unauthorizedHandler,
-                          AuthTokenFilter authTokenFilter) {
+            AuthEntryPointJwt unauthorizedHandler,
+            AuthTokenFilter authTokenFilter) {
         this.userDetailsService = userDetailsService;
         this.unauthorizedHandler = unauthorizedHandler;
         this.authTokenFilter = authTokenFilter;
@@ -56,11 +56,15 @@ public class SecurityConfig {
                 .cors(cors -> cors.configure(http))
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/signin").permitAll()
+                        .requestMatchers("/api/auth/signup/cliente").permitAll()
+                        .requestMatchers("/api/auth/signup/admin", "/api/auth/signup/grupo")
+                        .hasAnyAuthority("ADMIN", "GRUPO")
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/servicios", "/api/servicios/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/servicios/**").permitAll()
+                        .requestMatchers("/api/servicios/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/tipos-servicio/**").permitAll()
-                        .anyRequest().authenticated()
-                );
+                        .anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);

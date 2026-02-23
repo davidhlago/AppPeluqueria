@@ -62,7 +62,7 @@ public class ValoracionController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
     public ResponseEntity<List<Valoracion>> listarTodas() {
         return ResponseEntity.ok(servicioValoracion.obtenerTodas());
     }

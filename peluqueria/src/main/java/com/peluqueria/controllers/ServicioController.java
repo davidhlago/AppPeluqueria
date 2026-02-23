@@ -4,6 +4,7 @@ import com.peluqueria.entity.Servicio;
 import com.peluqueria.security.service.ServicioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,12 +30,14 @@ public class ServicioController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Servicio> crearServicio(@RequestBody Servicio servicio) {
         Servicio nuevo = servicioService.save(servicio);
         return ResponseEntity.status(201).body(nuevo);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Servicio> actualizarServicio(@PathVariable Long id, @RequestBody Servicio servicioDetalles) {
         Servicio existente = servicioService.findById(id);
         if (existente == null) {
@@ -56,6 +59,7 @@ public class ServicioController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> eliminarServicio(@PathVariable Long id) {
         Servicio servicio = servicioService.findById(id);
         if (servicio == null) {

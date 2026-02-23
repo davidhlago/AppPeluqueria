@@ -57,11 +57,11 @@ public class CitaController {
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             Long idLogueado = userDetails.getId();
 
-            boolean isAdmin = authentication.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+            boolean isPrivileged = authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ADMIN") || a.getAuthority().equals("GRUPO"));
 
-            // VALIDACIÓN: Si no es admin y la cita no le pertenece, 403
-            if (!isAdmin && !cita.getCliente().getId().equals(idLogueado)) {
+            // VALIDACIÓN: Si no es admin/grupo y la cita no le pertenece, 403
+            if (!isPrivileged && !cita.getCliente().getId().equals(idLogueado)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body("{\"error\": \"Acceso denegado a esta cita.\"}");
             }
@@ -112,7 +112,7 @@ public class CitaController {
 
     // --- NUEVO ENDPOINT PARA EDITAR CITA COMPLETA ---
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE') or hasAuthority('GRUPO')")
     public ResponseEntity<?> updateCita(@PathVariable long id, @RequestBody Cita cita) {
         try {
             Cita updated = citaService.modificarCita(id, cita);
@@ -123,7 +123,7 @@ public class CitaController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE') or hasAuthority('GRUPO')")
     public ResponseEntity<?> deleteCita(@PathVariable long id) {
         try {
             citaService.cancelarCita(id);

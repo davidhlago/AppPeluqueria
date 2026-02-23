@@ -32,10 +32,8 @@ public class ClienteController {
 
         String rol = userDetails.getAuthorities().iterator().next().getAuthority();
 
-        if ("ADMIN".equals(rol)) {
+        if ("ADMIN".equals(rol) || "GRUPO".equals(rol)) {
             return servicioCliente.obtenerTodosLosClientes();
-        } else if ("GRUPO".equals(rol)) {
-            return servicioCliente.obtenerClientesPorGrupo(userDetails.getId());
         } else {
             Long idUsuario = userDetails.getId();
             Cliente miPerfil = servicioCliente.obtenerClientePorId(idUsuario);
@@ -44,7 +42,7 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN') or #id == authentication.principal.id")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO') or #id == authentication.principal.id")
     public ResponseEntity<Cliente> obtenerClientePorId(@PathVariable Long id) {
         try {
             Cliente cliente = servicioCliente.obtenerClientePorId(id);
@@ -55,8 +53,9 @@ public class ClienteController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN') or #id == authentication.principal.id")
-    public ResponseEntity<Cliente> actualizarCliente(@PathVariable Long id, @Valid @RequestBody Cliente detallesCliente) {
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO') or #id == authentication.principal.id")
+    public ResponseEntity<Cliente> actualizarCliente(@PathVariable Long id,
+            @Valid @RequestBody Cliente detallesCliente) {
         try {
             Cliente clienteActualizado = servicioCliente.actualizarCliente(id, detallesCliente);
             return ResponseEntity.ok(clienteActualizado);
@@ -66,7 +65,7 @@ public class ClienteController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
     public ResponseEntity<Void> eliminarCliente(@PathVariable Long id) {
         try {
             servicioCliente.eliminarCliente(id);
@@ -77,7 +76,7 @@ public class ClienteController {
     }
 
     @GetMapping("/buscar")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
     public ResponseEntity<List<Cliente>> buscarClientes(@RequestParam String texto) {
         List<Cliente> clientes = servicioCliente.buscarObservacionesOAlergenos(texto);
         return clientes.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(clientes);
