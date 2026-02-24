@@ -1,0 +1,659 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 24-02-2026 a las 10:30:52
+-- Versión del servidor: 10.4.32-MariaDB
+-- Versión de PHP: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de datos: `serviciopeluqueria`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `admin`
+--
+
+CREATE TABLE `admin` (
+  `especialidad` varchar(255) DEFAULT NULL,
+  `id` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `admin`
+--
+
+INSERT INTO `admin` (`especialidad`, `id`) VALUES
+('Contabilidad', 4),
+('Recursos Humanos', 10),
+('Marketing Digital', 11),
+('Gestión de Personal', 12),
+('Marketing Digital', 16);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `bloqueo_horario`
+--
+
+CREATE TABLE `bloqueo_horario` (
+  `id_bloqueo` bigint(20) NOT NULL,
+  `fecha` date NOT NULL,
+  `hora_fin` time(6) DEFAULT NULL,
+  `hora_inicio` time(6) DEFAULT NULL,
+  `motivo` varchar(255) DEFAULT NULL,
+  `todo_el_dia` tinyint(1) DEFAULT NULL,
+  `id_grupo` bigint(20) DEFAULT NULL,
+  `id_servicio` bigint(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `citas`
+--
+
+CREATE TABLE `citas` (
+  `id_cita` bigint(20) NOT NULL,
+  `estado` varchar(255) DEFAULT NULL,
+  `fecha` date DEFAULT NULL,
+  `hora_fin` time(6) DEFAULT NULL,
+  `hora_inicio` time(6) DEFAULT NULL,
+  `id_cliente` bigint(20) DEFAULT NULL,
+  `id_grupo` bigint(20) DEFAULT NULL,
+  `id_horario_semana` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `citas`
+--
+
+INSERT INTO `citas` (`id_cita`, `estado`, `fecha`, `hora_fin`, `hora_inicio`, `id_cliente`, `id_grupo`, `id_horario_semana`) VALUES
+(1, 'COMPLETADA', '2026-02-26', '13:00:00.000000', '12:30:00.000000', 15, 1, 126);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `cliente`
+--
+
+CREATE TABLE `cliente` (
+  `alergenos` varchar(255) DEFAULT NULL,
+  `direccion` varchar(255) DEFAULT NULL,
+  `imagen_base64` longtext DEFAULT NULL,
+  `observacion` varchar(255) DEFAULT NULL,
+  `telefono` varchar(255) DEFAULT NULL,
+  `id` bigint(20) NOT NULL,
+  `grupo_id` bigint(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `cliente`
+--
+
+INSERT INTO `cliente` (`alergenos`, `direccion`, `imagen_base64`, `observacion`, `telefono`, `id`, `grupo_id`) VALUES
+('Alergia al Trabajo', 'Calle Mayor 10, 2A', NULL, 'Prefiere citas por la mañana', '600111222', 5, 9),
+('tinte', 'Av. Libertad 45', NULL, 'Cuero cabelludo sensibles palbsjs', '600333444', 6, NULL),
+('Alergia al Amoniaco', 'Plaza España 1', NULL, 'Suele venir con su hija', '600555666', 7, NULL),
+('Ninguno', 'Calle Pez 8', NULL, 'Le gusta el café solo', '600777888', 8, NULL),
+('Ninguno', 'Plaza Mayor 5', NULL, 'Primera vez', '611222333', 13, NULL),
+('Ninguno', 'Calle Falsa 123', NULL, 'Piel sensible', '655444333', 14, NULL),
+('Alergia al Trabajoksjbf', 'Calle Mayor 10, 2A', NULL, 'Prefiere citas por la mañana', '600111222', 15, NULL),
+('Ninguno', 'Dirección pendiente', NULL, 'Cliente de citas masivas', '600000000', 19, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `favoritos_cliente_servicio`
+--
+
+CREATE TABLE `favoritos_cliente_servicio` (
+  `id_cliente` bigint(20) NOT NULL,
+  `id_servicio` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `grupo`
+--
+
+CREATE TABLE `grupo` (
+  `curso` varchar(255) DEFAULT NULL,
+  `turno` varchar(255) DEFAULT NULL,
+  `id` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `grupo`
+--
+
+INSERT INTO `grupo` (`curso`, `turno`, `id`) VALUES
+('1º Grado Medio Estética', 'Mañana', 1),
+('1º Grado Medio Peluquería', 'Mañana', 2),
+('2º Grado Medio Estética (ACE)', 'Mañana', 3),
+('2º FP Básica Estética (Mañana)', 'Mañana', 4),
+('2º FP Básica Estética (Tarde)', 'Tarde', 5),
+('2º Grado Medio Estética', 'Mañana', 6),
+('2º Grado Superior Estética', 'Tarde', 7),
+('1º Grado Superior Estética', 'Tarde', 8),
+('2º Grado Superior EDP', 'Mañana', 9);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `horario_semanal`
+--
+
+CREATE TABLE `horario_semanal` (
+  `id_horario_semana` bigint(20) NOT NULL,
+  `cupo_maximo` int(11) NOT NULL,
+  `dias_semana` varchar(255) DEFAULT NULL,
+  `hora_fin` time(6) DEFAULT NULL,
+  `hora_inicio` time(6) DEFAULT NULL,
+  `id_grupo` bigint(20) DEFAULT NULL,
+  `id_servicio` bigint(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `horario_semanal`
+--
+
+INSERT INTO `horario_semanal` (`id_horario_semana`, `cupo_maximo`, `dias_semana`, `hora_fin`, `hora_inicio`, `id_grupo`, `id_servicio`) VALUES
+(125, 6, 'Lunes', '10:30:00.000000', '08:50:00.000000', 1, 1),
+(126, 6, 'Jueves', '14:00:00.000000', '12:00:00.000000', 1, 1),
+(127, 6, 'Miércoles', '14:00:00.000000', '12:00:00.000000', 2, 1),
+(128, 6, 'Viernes', '09:40:00.000000', '08:00:00.000000', 2, 1),
+(129, 6, 'Jueves', '14:00:00.000000', '11:05:00.000000', 3, 1),
+(130, 6, 'Lunes', '10:30:00.000000', '08:50:00.000000', 1, 2),
+(131, 6, 'Jueves', '14:00:00.000000', '12:00:00.000000', 1, 2),
+(132, 6, 'Miércoles', '14:00:00.000000', '12:00:00.000000', 2, 2),
+(133, 6, 'Viernes', '09:40:00.000000', '08:00:00.000000', 2, 2),
+(134, 6, 'Jueves', '14:00:00.000000', '11:05:00.000000', 3, 2),
+(135, 6, 'Lunes', '10:30:00.000000', '08:50:00.000000', 1, 3),
+(136, 6, 'Jueves', '14:00:00.000000', '12:00:00.000000', 1, 3),
+(137, 6, 'Miércoles', '14:00:00.000000', '12:00:00.000000', 2, 3),
+(138, 6, 'Viernes', '09:40:00.000000', '08:00:00.000000', 2, 3),
+(139, 6, 'Jueves', '14:00:00.000000', '11:05:00.000000', 3, 3),
+(140, 6, 'Lunes', '10:30:00.000000', '08:50:00.000000', 1, 4),
+(141, 6, 'Jueves', '14:00:00.000000', '12:00:00.000000', 1, 4),
+(142, 6, 'Miércoles', '14:00:00.000000', '12:00:00.000000', 2, 4),
+(143, 6, 'Viernes', '09:40:00.000000', '08:00:00.000000', 2, 4),
+(144, 6, 'Jueves', '14:00:00.000000', '11:05:00.000000', 3, 4),
+(145, 2, 'Viernes', '14:00:00.000000', '11:05:00.000000', 3, 5),
+(146, 4, 'Viernes', '14:00:00.000000', '11:05:00.000000', 3, 6),
+(147, 8, 'Miércoles', '10:35:00.000000', '08:30:00.000000', 4, 7),
+(148, 8, 'Miércoles', '20:45:00.000000', '19:00:00.000000', 5, 7),
+(149, 10, 'Jueves', '14:00:00.000000', '11:05:00.000000', 4, 8),
+(150, 10, 'Lunes', '17:45:00.000000', '15:00:00.000000', 5, 8),
+(151, 10, 'Viernes', '17:45:00.000000', '15:00:00.000000', 5, 8),
+(152, 10, 'Miércoles', '14:00:00.000000', '11:05:00.000000', 6, 8),
+(153, 10, 'Martes', '20:45:00.000000', '18:00:00.000000', 7, 8),
+(154, 10, 'Jueves', '14:00:00.000000', '11:05:00.000000', 4, 9),
+(155, 10, 'Lunes', '17:45:00.000000', '15:00:00.000000', 5, 9),
+(156, 10, 'Miércoles', '14:00:00.000000', '11:05:00.000000', 6, 9),
+(157, 10, 'Martes', '20:45:00.000000', '18:00:00.000000', 7, 9),
+(158, 8, 'Jueves', '14:00:00.000000', '11:05:00.000000', 4, 10),
+(159, 8, 'Lunes', '17:45:00.000000', '15:00:00.000000', 5, 10),
+(160, 8, 'Miércoles', '14:00:00.000000', '11:05:00.000000', 6, 10),
+(161, 8, 'Martes', '20:45:00.000000', '18:00:00.000000', 7, 10),
+(162, 8, 'Jueves', '14:00:00.000000', '11:05:00.000000', 4, 11),
+(163, 8, 'Lunes', '17:45:00.000000', '15:00:00.000000', 5, 11),
+(164, 8, 'Viernes', '17:45:00.000000', '15:00:00.000000', 5, 11),
+(165, 8, 'Miércoles', '14:00:00.000000', '11:05:00.000000', 6, 11),
+(166, 8, 'Martes', '20:45:00.000000', '18:00:00.000000', 7, 11),
+(167, 8, 'Jueves', '14:00:00.000000', '11:05:00.000000', 4, 12),
+(168, 8, 'Lunes', '17:45:00.000000', '15:00:00.000000', 5, 12),
+(169, 8, 'Miércoles', '14:00:00.000000', '11:05:00.000000', 6, 12),
+(170, 8, 'Martes', '17:45:00.000000', '15:00:00.000000', 7, 12),
+(171, 10, 'Jueves', '14:00:00.000000', '11:05:00.000000', 4, 13),
+(172, 10, 'Lunes', '17:45:00.000000', '15:00:00.000000', 5, 13),
+(173, 10, 'Miércoles', '14:00:00.000000', '11:05:00.000000', 6, 13),
+(174, 10, 'Martes', '20:45:00.000000', '18:00:00.000000', 7, 13),
+(175, 8, 'Jueves', '14:00:00.000000', '11:05:00.000000', 4, 14),
+(176, 8, 'Lunes', '17:45:00.000000', '15:00:00.000000', 5, 14),
+(177, 8, 'Miércoles', '14:00:00.000000', '11:05:00.000000', 6, 14),
+(178, 8, 'Martes', '20:45:00.000000', '18:00:00.000000', 7, 14),
+(179, 6, 'Jueves', '14:00:00.000000', '11:05:00.000000', 4, 15),
+(180, 6, 'Lunes', '17:45:00.000000', '15:00:00.000000', 5, 15),
+(181, 6, 'Miércoles', '14:00:00.000000', '11:05:00.000000', 6, 15),
+(182, 6, 'Martes', '20:45:00.000000', '18:00:00.000000', 7, 15),
+(183, 6, 'Jueves', '14:00:00.000000', '11:05:00.000000', 4, 16),
+(184, 6, 'Lunes', '17:45:00.000000', '15:00:00.000000', 5, 16),
+(185, 6, 'Miércoles', '14:00:00.000000', '11:05:00.000000', 6, 16),
+(186, 6, 'Martes', '20:45:00.000000', '18:00:00.000000', 7, 16),
+(187, 10, 'Jueves', '14:00:00.000000', '11:05:00.000000', 4, 17),
+(188, 10, 'Lunes', '17:45:00.000000', '15:00:00.000000', 5, 17),
+(189, 10, 'Miércoles', '14:00:00.000000', '11:05:00.000000', 6, 17),
+(190, 10, 'Martes', '20:45:00.000000', '18:00:00.000000', 7, 17),
+(191, 4, 'Jueves', '14:00:00.000000', '11:05:00.000000', 4, 18),
+(192, 4, 'Lunes', '17:45:00.000000', '15:00:00.000000', 5, 18),
+(193, 4, 'Miércoles', '14:00:00.000000', '11:05:00.000000', 6, 18),
+(194, 4, 'Martes', '20:45:00.000000', '18:00:00.000000', 7, 18),
+(195, 6, 'Lunes', '20:45:00.000000', '18:00:00.000000', 7, 19),
+(196, 6, 'Jueves', '14:00:00.000000', '11:05:00.000000', 6, 19),
+(197, 6, 'Lunes', '20:45:00.000000', '18:00:00.000000', 7, 20),
+(198, 6, 'Martes', '20:45:00.000000', '18:00:00.000000', 7, 20),
+(199, 6, 'Jueves', '14:00:00.000000', '11:05:00.000000', 6, 20),
+(200, 8, 'Lunes', '20:45:00.000000', '18:00:00.000000', 7, 21),
+(201, 8, 'Martes', '20:45:00.000000', '18:00:00.000000', 7, 21),
+(202, 8, 'Jueves', '14:00:00.000000', '11:05:00.000000', 6, 21),
+(203, 5, 'Lunes', '20:45:00.000000', '18:00:00.000000', 7, 22),
+(204, 5, 'Martes', '20:45:00.000000', '18:00:00.000000', 7, 22),
+(205, 5, 'Jueves', '14:00:00.000000', '11:05:00.000000', 6, 22),
+(206, 8, 'Martes', '17:45:00.000000', '15:00:00.000000', 7, 23),
+(207, 6, 'Martes', '17:45:00.000000', '15:00:00.000000', 7, 24),
+(208, 4, 'Martes', '17:45:00.000000', '15:00:00.000000', 7, 25),
+(209, 4, 'Miércoles', '10:35:00.000000', '08:45:00.000000', 1, 26),
+(210, 4, 'Jueves', '14:00:00.000000', '11:05:00.000000', 6, 26),
+(211, 4, 'Miércoles', '20:20:00.000000', '18:00:00.000000', 7, 26),
+(212, 4, 'Miércoles', '10:35:00.000000', '08:45:00.000000', 1, 27),
+(213, 4, 'Jueves', '14:00:00.000000', '11:05:00.000000', 6, 27),
+(214, 4, 'Miércoles', '20:20:00.000000', '18:00:00.000000', 7, 27),
+(215, 4, 'Jueves', '14:00:00.000000', '11:05:00.000000', 6, 28),
+(216, 4, 'Miércoles', '20:20:00.000000', '18:00:00.000000', 7, 28),
+(217, 4, 'Jueves', '14:00:00.000000', '11:05:00.000000', 6, 29),
+(218, 4, 'Miércoles', '20:20:00.000000', '18:00:00.000000', 7, 29),
+(219, 4, 'Miércoles', '20:20:00.000000', '18:00:00.000000', 7, 30),
+(220, 4, 'Miércoles', '20:20:00.000000', '18:00:00.000000', 7, 31),
+(221, 4, 'Miércoles', '20:20:00.000000', '18:00:00.000000', 7, 32),
+(222, 5, 'Jueves', '14:00:00.000000', '11:05:00.000000', 6, 33),
+(223, 5, 'Jueves', '14:00:00.000000', '11:05:00.000000', 6, 34),
+(224, 4, 'Miércoles', '20:20:00.000000', '18:00:00.000000', 7, 35),
+(225, 4, 'Miércoles', '20:20:00.000000', '18:00:00.000000', 7, 36),
+(226, 4, 'Miércoles', '20:20:00.000000', '18:00:00.000000', 7, 37),
+(227, 4, 'Miércoles', '20:20:00.000000', '18:00:00.000000', 7, 38),
+(228, 6, 'Miércoles', '10:35:00.000000', '08:45:00.000000', 1, 39),
+(229, 6, 'Jueves', '14:00:00.000000', '11:05:00.000000', 6, 39),
+(230, 6, 'Miércoles', '17:20:00.000000', '15:00:00.000000', 9, 39),
+(231, 6, 'Jueves', '14:00:00.000000', '11:05:00.000000', 6, 40),
+(232, 6, 'Miércoles', '17:20:00.000000', '15:00:00.000000', 9, 40),
+(233, 6, 'Jueves', '14:00:00.000000', '11:05:00.000000', 6, 41),
+(234, 6, 'Miércoles', '17:20:00.000000', '15:00:00.000000', 9, 41),
+(235, 6, 'Miércoles', '17:20:00.000000', '15:00:00.000000', 9, 42),
+(236, 6, 'Miércoles', '17:20:00.000000', '15:00:00.000000', 9, 43),
+(237, 6, 'Miércoles', '17:20:00.000000', '15:00:00.000000', 9, 44),
+(238, 4, 'Jueves', '14:00:00.000000', '11:05:00.000000', 6, 45),
+(239, 4, 'Miércoles', '17:20:00.000000', '15:00:00.000000', 9, 45),
+(240, 4, 'Jueves', '14:00:00.000000', '11:05:00.000000', 6, 46),
+(241, 4, 'Miércoles', '17:20:00.000000', '15:00:00.000000', 9, 46),
+(242, 4, 'Miércoles', '17:20:00.000000', '15:00:00.000000', 9, 47),
+(243, 2, 'Viernes', '18:55:00.000000', '15:00:00.000000', 9, 48),
+(244, 6, 'Viernes', '12:55:00.000000', '11:05:00.000000', 4, 49),
+(245, 6, 'Viernes', '20:45:00.000000', '19:00:00.000000', 5, 49),
+(246, 6, 'Lunes', '14:00:00.000000', '11:05:00.000000', 1, 50),
+(247, 6, 'Viernes', '12:55:00.000000', '09:40:00.000000', 1, 50),
+(248, 8, 'Martes', '14:00:00.000000', '11:05:00.000000', 8, 50);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `servicio`
+--
+
+CREATE TABLE `servicio` (
+  `id_servicio` bigint(20) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  `duracion_bloques` int(11) NOT NULL,
+  `imagen_base64` longtext DEFAULT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `precio` double NOT NULL,
+  `tipo_servicio_id` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `servicio`
+--
+
+INSERT INTO `servicio` (`id_servicio`, `descripcion`, `duracion_bloques`, `imagen_base64`, `nombre`, `precio`, `tipo_servicio_id`) VALUES
+(1, 'Sin esmaltar', 2, NULL, 'Manicura exprés', 2, 1),
+(2, 'Esmaltado semipermanente', 3, NULL, 'Manicura completa', 5, 1),
+(3, 'Esmaltado semipermanente', 3, NULL, 'Pedicura más esmaltado', 5, 1),
+(4, 'Hidratación profunda manos/pies', 2, NULL, 'Tratamiento parafina', 2, 1),
+(5, 'Construcción técnica de uñas', 6, NULL, 'Uñas artificiales', 10, 1),
+(6, 'Esmaltado técnica TUA', 4, NULL, 'Manicura semipermanente TUA', 5, 1),
+(7, 'Esmaltado tradicional', 2, NULL, 'Manicura normal', 2, 1),
+(8, 'Labio, cejas, mentón y diseño', 1, NULL, 'Depilación facial y cejas', 3, 2),
+(9, 'Cera en axilas', 1, NULL, 'Depilación axilas', 4, 2),
+(10, 'Cera en brazos completos', 1, NULL, 'Depilación brazos', 6, 2),
+(11, 'Cera hasta la rodilla', 1, NULL, 'Depilación medias piernas', 8, 2),
+(12, 'Cera pierna entera', 2, NULL, 'Depilación piernas completas', 10, 2),
+(13, 'Ingle normal', 1, NULL, 'Depilación ingle', 4, 2),
+(14, 'Estilo brasileño', 2, NULL, 'Depilación ingle brasileña', 5, 2),
+(15, 'Depilación total zona íntima', 2, NULL, 'Depilación ingle integral', 6, 2),
+(16, 'Cera en espalda completa', 2, NULL, 'Depilación espalda', 4, 2),
+(17, 'Cera en zona abdominal', 1, NULL, 'Depilación abdomen', 3, 2),
+(18, 'Cejas, labio, axilas, piernas e ingles', 3, NULL, 'Pack completo depilación', 18, 2),
+(19, 'Curvatura natural', 2, NULL, 'Lifting pestañas', 8, 3),
+(20, 'Diseño y fijación', 2, NULL, 'Laminado cejas', 8, 3),
+(21, 'Coloración intensa', 1, NULL, 'Tinte pestañas', 5, 3),
+(22, 'Tratamiento mirada completa', 2, NULL, 'Lifting + Tinte pestañas', 12, 3),
+(23, 'Masaje manual desintoxicante facial', 2, NULL, 'Drenaje linfático facial', 3, 4),
+(24, 'Masaje manual desintoxicante corporal', 3, NULL, 'Drenaje linfático corporal', 6, 5),
+(25, 'Drenaje integral cuerpo y cara', 5, NULL, 'Drenaje linfático completo', 8, 5),
+(26, 'Limpieza profunda con extracción', 3, NULL, 'Higiene Profunda facial', 15, 4),
+(27, 'Recuperación hídrica intensa', 3, NULL, 'Tratamiento Hidratación Facial', 15, 4),
+(28, 'Efecto tensor y reafirmante', 3, NULL, 'Tratamiento Antienvejecimiento Facial', 15, 4),
+(29, 'Luminosidad y antioxidación', 3, NULL, 'Tratamiento Vitamina C Facial', 15, 4),
+(30, 'Equilibrio y pureza', 3, NULL, 'Tratamiento pieles grasas Facial', 15, 4),
+(31, 'Control de manchas y tono', 3, NULL, 'Tratamiento despigmentante Facial', 15, 4),
+(32, 'Cuidado específico contorno ojos', 3, NULL, 'Tratamiento para bolsas y ojeras', 15, 4),
+(33, 'Renovación celular corporal', 2, NULL, 'Exfoliación corporal', 10, 5),
+(34, 'Nutrición profunda cuerpo', 2, NULL, 'Hidratación corporal', 10, 5),
+(35, 'Mejora textura y celulitis', 3, NULL, 'Tratamiento anticelulítico corporal', 20, 5),
+(36, 'Reducción de volumen localizado', 3, NULL, 'Tratamiento reductor corporal', 20, 5),
+(37, 'Alivio de piernas cansadas', 3, NULL, 'Tratamiento mejora circulación', 20, 5),
+(38, 'Relajación y bienestar emocional', 3, NULL, 'Tratamiento fatiga y estrés', 20, 5),
+(39, 'Relajación cabeza, cuello y cara', 2, NULL, 'Masaje craneofacial', 10, 6),
+(40, 'Masaje terapéutico o relajante espalda', 2, NULL, 'Masaje espalda', 10, 6),
+(41, 'Masaje para activar el retorno', 2, NULL, 'Masaje circulatorio piernas', 10, 6),
+(42, 'Uso de maderas o piedras en zona', 2, NULL, 'Masaje con material complementario', 10, 6),
+(43, 'Masaje vigoroso en áreas críticas', 2, NULL, 'Masaje anticelulítico zonal', 10, 6),
+(44, 'Masaje para modelar contorno', 2, NULL, 'Masaje reductor zonal', 10, 6),
+(45, 'Bienestar integral cuerpo entero', 3, NULL, 'Masaje relajante corporal completo', 15, 6),
+(46, 'Realizado por dos profesionales', 3, NULL, 'Masaje completo a 4 manos', 15, 6),
+(47, 'Técnicas ancestrales integradas', 3, NULL, 'Masaje del mundo completo', 15, 6),
+(48, 'Maquillaje permanente (Disponible Abril)', 8, NULL, 'Micropigmentación', 50, 7),
+(49, 'Maquillaje natural con base hidratante', 3, NULL, 'Maquillaje de día con hidratación', 5, 7),
+(50, 'Sesión para eventos Día/Tarde/Noche', 3, NULL, 'Maquillaje Social', 10, 7);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tipo_servicio`
+--
+
+CREATE TABLE `tipo_servicio` (
+  `id` bigint(20) NOT NULL,
+  `descripcion` varchar(255) DEFAULT NULL,
+  `nombre` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tipo_servicio`
+--
+
+INSERT INTO `tipo_servicio` (`id`, `descripcion`, `nombre`) VALUES
+(1, 'Servicios de manicura, pedicura y uñas artificiales', 'Estética de Manos y Pies'),
+(2, 'Servicios de depilación con cera facial y corporal', 'Depilación'),
+(3, 'Tratamientos de pestañas y cejas', 'Belleza de la Mirada'),
+(4, 'Limpieza y tratamientos específicos para el rostro', 'Tratamientos Faciales'),
+(5, 'Exfoliación, hidratación y tratamientos reductores', 'Tratamientos Corporales'),
+(6, 'Masajes manuales de relajación y bienestar', 'Masajes'),
+(7, 'Servicios de maquillaje social y técnicas especiales', 'Maquillaje y Otros');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `usuarios`
+--
+
+CREATE TABLE `usuarios` (
+  `tipo_usuario` varchar(31) NOT NULL,
+  `id` bigint(20) NOT NULL,
+  `apellidos` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `nombre` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `reset_token` varchar(255) DEFAULT NULL,
+  `rol` varchar(255) DEFAULT NULL,
+  `username` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `usuarios`
+--
+
+INSERT INTO `usuarios` (`tipo_usuario`, `id`, `apellidos`, `email`, `nombre`, `password`, `reset_token`, `rol`, `username`) VALUES
+('GRUPO', 1, 'Estética Mañana', '1gmest@centro.es', '1GMEST', 'pass123', NULL, 'GRUPO', '1gmest'),
+('GRUPO', 2, 'Peluquería Mañana', '1gmp@centro.es', '1 GMP', 'pass123', NULL, 'GRUPO', '1gmp'),
+('GRUPO', 3, 'Estética ACE', '2gmest@centro.es', '2 GM EST', 'pass123', NULL, 'GRUPO', '2gmest'),
+('GRUPO', 4, 'Básica Mañana', '2fpbd@centro.es', '2FPBD', 'pass123', NULL, 'GRUPO', '2fpbd'),
+('GRUPO', 5, 'Básica Tarde', '2fpbv@centro.es', '2 FPBV', 'pass123', NULL, 'GRUPO', '2fpbv'),
+('GRUPO', 6, 'Estética General', '2gme@centro.es', '2GME', 'pass123', NULL, 'GRUPO', '2gme'),
+('GRUPO', 7, 'Superior Estética', '2gseib@centro.es', '2GS EIB', 'pass123', NULL, 'GRUPO', '2gseib'),
+('GRUPO', 8, 'Superior Masaje', '1gseib@centro.es', '1 GS EIB', 'pass123', NULL, 'GRUPO', '1gseib'),
+('GRUPO', 9, 'Superior Estética EDP', '2gsedp@centro.es', '2GS EDP', 'pass123', NULL, 'GRUPO', '2gsedp'),
+('ADMIN', 10, 'Gomez_nuevo', 'laura.admin@peluqueria.com', 'Laura_nuevo', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', NULL, 'ADMIN', 'admin_laura_nuevo'),
+('ADMIN', 11, 'Martinez', 'david.admin@peluqueria.com', 'David', '$2a$10$sfBqCurhq8oh57/sWJJeauzwjM8brU3.o6SrEjX5zqp1D3I3OgmQm', NULL, 'ADMIN', 'admin_david'),
+('ADMIN', 12, 'Díaz', 'marta.admin@peluqueria.com', 'Marta', '$2a$10$ImBVoCUn./e9h6NbD1VWzOgdP0OQhWqAJBUEg6AySS4rOMmJhO.US', NULL, 'ADMIN', 'admin_marta'),
+('CLIENTE', 13, 'Méndez', 'lucia@email.com', 'Lucía', '$2a$10$o9XPgXyi3Adp6WUtBJ7dx.iEkoORndupKh0qzGOMedp3FZa/WjGYW', NULL, 'CLIENTE', 'lucia.user'),
+('CLIENTE', 14, 'Vargas', 'elena@email.com', 'Elena', '$2a$10$gNN3BfYXbDdPLMxB9jytdunvo9fUhZCy0PSgECTrYejL77Cm/rsGK', NULL, 'CLIENTE', 'elena.vargas'),
+('CLIENTE', 15, 'lamichhane', 'suman@gmail.com', 'suman', '$2a$10$tEjfk/g9OtUoh1tHvqWGIeMRPRIdiEErB/opn8CEJMcAQZPtSIOsy', NULL, 'CLIENTE', 'cliente_suman'),
+('ADMIN', 16, 'Apellidos...', 'davidaa.admin@peluqueria.com', 'aa', '$2a$10$Jyg6uOGkIZhn4HHRrSLrqu8YX.m2WoSCKEHm/omBHYtWFHyG8ZpnO', NULL, 'ADMIN', 'a'),
+('CLIENTE', 17, 'lamichhane', 'lamichhanesuman79@gmail.com', 'suman', '$2a$10$96VfuAPHWxXSWsCF.OBOQ.edRLwdYKK.Yjz79fK0unajDwoBMQKh2', NULL, 'CLIENTE', 'sumlan'),
+('CLIENTE', 18, 'lula', 'lulelala@test.com', 'lale', '$2a$10$1Dd2PUO3MKaCVRWuILaooOQJ6G/FKzylPGjCFviH4PiqQH5UKofq.', NULL, 'CLIENTE', 'cliente_lale'),
+('CLIENTE', 19, 'xata', 'okxata@gmail.com', 'ok', '$2a$10$yt58DpTGQU3WRh37Oya3sur6gfTA2d7KNgj0lN7hv77uqLR.yh1VC', NULL, 'CLIENTE', 'cliente_ok'),
+('CLIENTE', 20, 'shyam', 'ramshyam@gmail.com', 'ram', '$2a$10$n2sLYmelOY0vRloXr8YVS.Amj1nEYurqRE9xCvQhHoh3tWHbdBaj.', NULL, 'CLIENTE', 'cliente_ram'),
+('CLIENTE', 21, 'espino', 'hiloespino@gmail.com', 'hilo', '$2a$10$p9eDKh.o5HireHTMga/IceE.x/3hZUrEwby25ZDoqy4sRdsY/X/me', NULL, 'CLIENTE', 'cliente_hilo');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `valoracion`
+--
+
+CREATE TABLE `valoracion` (
+  `id_valoracion` bigint(20) NOT NULL,
+  `claridad_comunicacion` double NOT NULL,
+  `comentario` text DEFAULT NULL,
+  `desarrollo_servicio` double NOT NULL,
+  `fecha_valoracion` datetime(6) DEFAULT NULL,
+  `general` double NOT NULL,
+  `imagen_base64` longtext DEFAULT NULL,
+  `limpieza_organizacion` double NOT NULL,
+  `trato_personal` double NOT NULL,
+  `id_cita` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Índices para tablas volcadas
+--
+
+--
+-- Indices de la tabla `admin`
+--
+ALTER TABLE `admin`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `bloqueo_horario`
+--
+ALTER TABLE `bloqueo_horario`
+  ADD PRIMARY KEY (`id_bloqueo`),
+  ADD KEY `FKfjpfhc68cyi1xja0v89jufsxe` (`id_grupo`),
+  ADD KEY `FKih3r9godeigqtnpuv0jq6olky` (`id_servicio`);
+
+--
+-- Indices de la tabla `citas`
+--
+ALTER TABLE `citas`
+  ADD PRIMARY KEY (`id_cita`),
+  ADD KEY `FKjkd00dq43rrhc7mse8pibn3d3` (`id_cliente`),
+  ADD KEY `FK7gieydedar8e8kbydi6xmx1s3` (`id_grupo`),
+  ADD KEY `FKldcjfxkvp96q8hh20eqiokrja` (`id_horario_semana`);
+
+--
+-- Indices de la tabla `cliente`
+--
+ALTER TABLE `cliente`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKi00831t74lxfvnayicnwovcp5` (`grupo_id`);
+
+--
+-- Indices de la tabla `favoritos_cliente_servicio`
+--
+ALTER TABLE `favoritos_cliente_servicio`
+  ADD PRIMARY KEY (`id_cliente`,`id_servicio`),
+  ADD KEY `FK39scp6u293vude2u446tkdrei` (`id_servicio`);
+
+--
+-- Indices de la tabla `grupo`
+--
+ALTER TABLE `grupo`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `horario_semanal`
+--
+ALTER TABLE `horario_semanal`
+  ADD PRIMARY KEY (`id_horario_semana`),
+  ADD KEY `FKe3y9sudwf3w5vbgy8mphvcq96` (`id_grupo`),
+  ADD KEY `FK4o3hudak4t9pxpwdgtrh2add0` (`id_servicio`);
+
+--
+-- Indices de la tabla `servicio`
+--
+ALTER TABLE `servicio`
+  ADD PRIMARY KEY (`id_servicio`),
+  ADD KEY `FK5g48yc2sr5ecks0ay9leesuv2` (`tipo_servicio_id`);
+
+--
+-- Indices de la tabla `tipo_servicio`
+--
+ALTER TABLE `tipo_servicio`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UK49qoy51a9qftp0y9bfgi2r5qm` (`nombre`);
+
+--
+-- Indices de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UKkfsp0s1tflm1cwlj8idhqsad0` (`email`),
+  ADD UNIQUE KEY `UKm2dvbwfge291euvmk6vkkocao` (`username`);
+
+--
+-- Indices de la tabla `valoracion`
+--
+ALTER TABLE `valoracion`
+  ADD PRIMARY KEY (`id_valoracion`),
+  ADD KEY `FKfdncoi4ykhx9raua31qdhe6y9` (`id_cita`);
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+
+--
+-- AUTO_INCREMENT de la tabla `bloqueo_horario`
+--
+ALTER TABLE `bloqueo_horario`
+  MODIFY `id_bloqueo` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `citas`
+--
+ALTER TABLE `citas`
+  MODIFY `id_cita` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `horario_semanal`
+--
+ALTER TABLE `horario_semanal`
+  MODIFY `id_horario_semana` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=249;
+
+--
+-- AUTO_INCREMENT de la tabla `servicio`
+--
+ALTER TABLE `servicio`
+  MODIFY `id_servicio` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+
+--
+-- AUTO_INCREMENT de la tabla `tipo_servicio`
+--
+ALTER TABLE `tipo_servicio`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT de la tabla `valoracion`
+--
+ALTER TABLE `valoracion`
+  MODIFY `id_valoracion` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `admin`
+--
+ALTER TABLE `admin`
+  ADD CONSTRAINT `FKhjrv95ryqymlav9uct846evsa` FOREIGN KEY (`id`) REFERENCES `usuarios` (`id`);
+
+--
+-- Filtros para la tabla `bloqueo_horario`
+--
+ALTER TABLE `bloqueo_horario`
+  ADD CONSTRAINT `FKfjpfhc68cyi1xja0v89jufsxe` FOREIGN KEY (`id_grupo`) REFERENCES `grupo` (`id`),
+  ADD CONSTRAINT `FKih3r9godeigqtnpuv0jq6olky` FOREIGN KEY (`id_servicio`) REFERENCES `servicio` (`id_servicio`);
+
+--
+-- Filtros para la tabla `citas`
+--
+ALTER TABLE `citas`
+  ADD CONSTRAINT `FK7gieydedar8e8kbydi6xmx1s3` FOREIGN KEY (`id_grupo`) REFERENCES `grupo` (`id`),
+  ADD CONSTRAINT `FKjkd00dq43rrhc7mse8pibn3d3` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id`),
+  ADD CONSTRAINT `FKldcjfxkvp96q8hh20eqiokrja` FOREIGN KEY (`id_horario_semana`) REFERENCES `horario_semanal` (`id_horario_semana`);
+
+--
+-- Filtros para la tabla `cliente`
+--
+ALTER TABLE `cliente`
+  ADD CONSTRAINT `FKi00831t74lxfvnayicnwovcp5` FOREIGN KEY (`grupo_id`) REFERENCES `grupo` (`id`),
+  ADD CONSTRAINT `FKl80wv21oi0mn8x6awsn1nwy5j` FOREIGN KEY (`id`) REFERENCES `usuarios` (`id`);
+
+--
+-- Filtros para la tabla `favoritos_cliente_servicio`
+--
+ALTER TABLE `favoritos_cliente_servicio`
+  ADD CONSTRAINT `FK2ln4kxlb6u8l8o58u8lcs46fa` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id`),
+  ADD CONSTRAINT `FK39scp6u293vude2u446tkdrei` FOREIGN KEY (`id_servicio`) REFERENCES `servicio` (`id_servicio`);
+
+--
+-- Filtros para la tabla `grupo`
+--
+ALTER TABLE `grupo`
+  ADD CONSTRAINT `FK1jlverbe0cq18yyf84x3m39en` FOREIGN KEY (`id`) REFERENCES `usuarios` (`id`);
+
+--
+-- Filtros para la tabla `horario_semanal`
+--
+ALTER TABLE `horario_semanal`
+  ADD CONSTRAINT `FK4o3hudak4t9pxpwdgtrh2add0` FOREIGN KEY (`id_servicio`) REFERENCES `servicio` (`id_servicio`),
+  ADD CONSTRAINT `FKe3y9sudwf3w5vbgy8mphvcq96` FOREIGN KEY (`id_grupo`) REFERENCES `grupo` (`id`);
+
+--
+-- Filtros para la tabla `servicio`
+--
+ALTER TABLE `servicio`
+  ADD CONSTRAINT `FK5g48yc2sr5ecks0ay9leesuv2` FOREIGN KEY (`tipo_servicio_id`) REFERENCES `tipo_servicio` (`id`);
+
+--
+-- Filtros para la tabla `valoracion`
+--
+ALTER TABLE `valoracion`
+  ADD CONSTRAINT `FKfdncoi4ykhx9raua31qdhe6y9` FOREIGN KEY (`id_cita`) REFERENCES `citas` (`id_cita`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
