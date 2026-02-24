@@ -136,19 +136,31 @@ public class AuthController {
 
     // ---------------- SIGN UP (REGISTRO) ----------------
     @PostMapping("/signup/cliente")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
     public ResponseEntity<?> crearCliente(@Valid @RequestBody Cliente cliente) {
+        System.out.println("Solicitud de registro de cliente: " + cliente.getUsername());
         if (usuarioRepository.findByUsername(cliente.getUsername()) != null) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Usuario en uso."));
+            return ResponseEntity.badRequest().body(
+                    new MessageResponse("Error: El nombre de usuario '" + cliente.getUsername() + "' ya está en uso."));
         }
-        cliente.setPassword(passwordEncoder.encode(cliente.getPassword()));
-        cliente.setRol("CLIENTE");
-        usuarioRepository.save(cliente);
-        return ResponseEntity.ok(new MessageResponse("Cliente registrado correctamente."));
+        if (usuarioRepository.findByEmail(cliente.getEmail()) != null) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Error: El email '" + cliente.getEmail() + "' ya está registrado."));
+        }
+        try {
+            cliente.setPassword(passwordEncoder.encode(cliente.getPassword()));
+            cliente.setRol("CLIENTE");
+            usuarioRepository.save(cliente);
+            System.out.println("Cliente registrado con éxito: " + cliente.getUsername());
+            return ResponseEntity.ok(new MessageResponse("Cliente registrado correctamente."));
+        } catch (Exception e) {
+            System.err.println("Error al guardar cliente: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new MessageResponse("Error interno al registrar cliente: " + e.getMessage()));
+        }
     }
 
     @PostMapping("/signup/admin")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> crearAdmin(@Valid @RequestBody Admin admin) {
         if (usuarioRepository.findByUsername(admin.getUsername()) != null) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Usuario en uso."));
@@ -160,7 +172,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup/grupo")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> crearGrupo(@Valid @RequestBody Grupo grupo) {
         if (usuarioRepository.findByUsername(grupo.getUsername()) != null) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Usuario en uso."));

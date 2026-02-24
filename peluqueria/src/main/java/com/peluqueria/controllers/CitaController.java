@@ -82,7 +82,7 @@ public class CitaController {
     // --- MÉTODOS DE ESCRITURA ---
 
     @PostMapping("/reservar")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('CLIENTE') or hasAuthority('GRUPO')")
     public ResponseEntity<?> addCita(@RequestBody Cita cita) {
         Cita added = citaService.crearCita(cita);
         return new ResponseEntity<>(added, HttpStatus.CREATED);
