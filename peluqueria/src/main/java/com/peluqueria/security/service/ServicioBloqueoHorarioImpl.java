@@ -65,20 +65,7 @@ public class ServicioBloqueoHorarioImpl implements ServicioBloqueoHorario {
         }
 
         // 2. Cancelar Citas existentes automáticamente
-        List<com.peluqueria.entity.Cita> citasConflictivas = citaRepository.findCitasParaBloqueo(
-                bloqueo.getFecha(),
-                bloqueo.getGrupo() != null ? bloqueo.getGrupo().getId() : null,
-                bloqueo.getServicio() != null ? bloqueo.getServicio().getIdServicio() : null,
-                bloqueo.getHoraInicio(),
-                bloqueo.getHoraFin());
-
-        if (!citasConflictivas.isEmpty()) {
-            for (com.peluqueria.entity.Cita cita : citasConflictivas) {
-                cita.setEstado("CANCELADA");
-                cita.setMotivoCancelacion(bloqueo.getMotivo());
-                citaRepository.save(cita);
-            }
-        }
+        cancelarCitasConflictivas(bloqueo);
 
         // Asignar entidades reales (Evita TransientObjectException)
         if (bloqueo.getGrupo() != null && bloqueo.getGrupo().getId() != null) {
@@ -98,6 +85,28 @@ public class ServicioBloqueoHorarioImpl implements ServicioBloqueoHorario {
         }
 
         return bloqueoRepository.save(bloqueo);
+    }
+
+    /**
+     * Cancela automáticamente las citas que entran en conflicto con un bloqueo.
+     */
+    private void cancelarCitasConflictivas(BloqueoHorario bloqueo) {
+        List<com.peluqueria.entity.Cita> citasConflictivas = citaRepository.findCitasParaBloqueo(
+                bloqueo.getFecha(),
+                bloqueo.getGrupo() != null ? bloqueo.getGrupo().getId() : null,
+                bloqueo.getServicio() != null ? bloqueo.getServicio().getIdServicio() : null,
+                bloqueo.getHoraInicio(),
+                bloqueo.getHoraFin());
+
+        if (!citasConflictivas.isEmpty()) {
+            for (com.peluqueria.entity.Cita cita : citasConflictivas) {
+                cita.setEstado("CANCELADA");
+                cita.setMotivoCancelacion(bloqueo.getMotivo());
+                citaRepository.save(cita);
+                System.out.println(
+                        "Cita cancelada automáticamente ID: " + cita.getIdCita() + " por conflicto con bloqueo.");
+            }
+        }
     }
 
     @Override
@@ -173,28 +182,24 @@ public class ServicioBloqueoHorarioImpl implements ServicioBloqueoHorario {
         }
 
         // 4. Actualizar Relaciones (Grupo y Servicio)
-        // IMPORTANTE: Buscamos de nuevo para evitar TransientObjectException
-
-        // Actualizar Grupo
         if (datosNuevos.getGrupo() != null && datosNuevos.getGrupo().getId() != null) {
             Grupo g = grupoRepository.findById(datosNuevos.getGrupo().getId())
                     .orElseThrow(() -> new RuntimeException("Grupo no encontrado"));
             actual.setGrupo(g);
         } else {
-            // Si viene null, significa que ahora es un bloqueo GLOBAL (para todos los
-            // grupos)
             actual.setGrupo(null);
         }
 
-        // Actualizar Servicio
         if (datosNuevos.getServicio() != null && datosNuevos.getServicio().getIdServicio() != null) {
             Servicio s = servicioRepository.findById(datosNuevos.getServicio().getIdServicio())
                     .orElseThrow(() -> new RuntimeException("Servicio no encontrado"));
             actual.setServicio(s);
         } else {
-            // Si viene null, significa que ahora bloquea TODOS los servicios
             actual.setServicio(null);
         }
+
+        // 5. IMPORTANTE: Cancelar citas conflictivas tras la actualización
+        cancelarCitasConflictivas(actual);
 
         return bloqueoRepository.save(actual);
     }
