@@ -64,7 +64,7 @@ public class ServicioBloqueoHorarioImpl implements ServicioBloqueoHorario {
                     "Ya existe un bloqueo para esa fecha/hora. Motivo: " + existente.getMotivo());
         }
 
-        // 2. Validar conflictos con Citas existentes
+        // 2. Cancelar Citas existentes automáticamente
         List<com.peluqueria.entity.Cita> citasConflictivas = citaRepository.findCitasParaBloqueo(
                 bloqueo.getFecha(),
                 bloqueo.getGrupo() != null ? bloqueo.getGrupo().getId() : null,
@@ -73,9 +73,11 @@ public class ServicioBloqueoHorarioImpl implements ServicioBloqueoHorario {
                 bloqueo.getHoraFin());
 
         if (!citasConflictivas.isEmpty()) {
-            throw new com.peluqueria.exception.BloqueoHorarioException(
-                    "No se puede bloquear: Existen " + citasConflictivas.size()
-                            + " cita(s) programada(s) en ese horario.");
+            for (com.peluqueria.entity.Cita cita : citasConflictivas) {
+                cita.setEstado("CANCELADA");
+                cita.setMotivoCancelacion(bloqueo.getMotivo());
+                citaRepository.save(cita);
+            }
         }
 
         // Asignar entidades reales (Evita TransientObjectException)

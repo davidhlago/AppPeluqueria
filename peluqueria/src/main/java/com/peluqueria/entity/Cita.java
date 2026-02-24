@@ -17,52 +17,100 @@ public class Cita {
     private LocalTime horaInicio;
     private LocalTime horaFin;
     private String estado;
+    private String motivoCancelacion;
 
     @ManyToOne
     @JoinColumn(name = "id_cliente")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Cliente cliente;
 
     @ManyToOne
     @JoinColumn(name = "id_grupo")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Grupo grupo;
 
     @ManyToOne
     @JoinColumn(name = "id_horario_semana", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private HorarioSemanal horarioSemanal;
 
-    public Cita() {}
+    public Cita() {
+    }
 
-
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     public Servicio getServicio() {
         return (horarioSemanal != null) ? horarioSemanal.getServicio() : null;
     }
 
+    public Long getIdCita() {
+        return idCita;
+    }
 
-    public Long getIdCita() { return idCita; }
-    public void setIdCita(Long idCita) { this.idCita = idCita; }
+    public void setIdCita(Long idCita) {
+        this.idCita = idCita;
+    }
 
-    public LocalDate getFecha() { return fecha; }
-    public void setFecha(LocalDate fecha) { this.fecha = fecha; }
+    public LocalDate getFecha() {
+        return fecha;
+    }
 
-    public LocalTime getHoraInicio() { return horaInicio; }
-    public void setHoraInicio(LocalTime horaInicio) { this.horaInicio = horaInicio; }
+    public void setFecha(LocalDate fecha) {
+        this.fecha = fecha;
+    }
 
-    public LocalTime getHoraFin() { return horaFin; }
-    public void setHoraFin(LocalTime horaFin) { this.horaFin = horaFin; }
+    public LocalTime getHoraInicio() {
+        return horaInicio;
+    }
 
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    public void setHoraInicio(LocalTime horaInicio) {
+        this.horaInicio = horaInicio;
+    }
 
-    public Cliente getCliente() { return cliente; }
-    public void setCliente(Cliente cliente) { this.cliente = cliente; }
+    public LocalTime getHoraFin() {
+        return horaFin;
+    }
 
-    public Grupo getGrupo() { return grupo; }
-    public void setGrupo(Grupo grupo) { this.grupo = grupo; }
+    public void setHoraFin(LocalTime horaFin) {
+        this.horaFin = horaFin;
+    }
 
-    public HorarioSemanal getHorarioSemanal() { return horarioSemanal; }
-    public void setHorarioSemanal(HorarioSemanal horarioSemanal) { this.horarioSemanal = horarioSemanal; }
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public String getMotivoCancelacion() {
+        return motivoCancelacion;
+    }
+
+    public void setMotivoCancelacion(String motivoCancelacion) {
+        this.motivoCancelacion = motivoCancelacion;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    public Grupo getGrupo() {
+        return grupo;
+    }
+
+    public void setGrupo(Grupo grupo) {
+        this.grupo = grupo;
+    }
+
+    public HorarioSemanal getHorarioSemanal() {
+        return horarioSemanal;
+    }
+
+    public void setHorarioSemanal(HorarioSemanal horarioSemanal) {
+        this.horarioSemanal = horarioSemanal;
+    }
 }
