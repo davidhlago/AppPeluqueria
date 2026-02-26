@@ -25,4 +25,6 @@ public interface ServicioBloqueoHorario {
     BloqueoHorario actualizarBloqueo(Long id, BloqueoHorario bloqueoDetails);
 
     BloqueoHorario obtenerPorId(Long id);
+
+    List<BloqueoHorario> crearBloqueoRango(BloqueoHorario base, LocalDate fechaFin);
 }

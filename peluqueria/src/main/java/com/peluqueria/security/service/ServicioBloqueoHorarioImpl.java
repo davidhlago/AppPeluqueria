@@ -203,4 +203,32 @@ public class ServicioBloqueoHorarioImpl implements ServicioBloqueoHorario {
 
         return bloqueoRepository.save(actual);
     }
+
+    @Override
+    @Transactional
+    public List<BloqueoHorario> crearBloqueoRango(BloqueoHorario base, LocalDate fechaFin) {
+        if (fechaFin == null || !fechaFin.isAfter(base.getFecha())) {
+            // Si no hay fecha fin o es anterior/igual, tratamos como un solo día
+            return List.of(crearBloqueo(base));
+        }
+
+        java.util.List<BloqueoHorario> creados = new java.util.ArrayList<>();
+        LocalDate actual = base.getFecha();
+
+        while (!actual.isAfter(fechaFin)) {
+            BloqueoHorario nuevo = new BloqueoHorario();
+            nuevo.setFecha(actual);
+            nuevo.setHoraInicio(base.getHoraInicio());
+            nuevo.setHoraFin(base.getHoraFin());
+            nuevo.setTodoElDia(base.isTodoElDia());
+            nuevo.setMotivo(base.getMotivo());
+            nuevo.setGrupo(base.getGrupo());
+            nuevo.setServicio(base.getServicio());
+
+            creados.add(crearBloqueo(nuevo));
+            actual = actual.plusDays(1);
+        }
+
+        return creados;
+    }
 }

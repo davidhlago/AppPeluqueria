@@ -79,9 +79,16 @@ public class BloqueoHorarioController {
     // POST - Crear nuevo bloqueo (solo ADMIN)
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> crearBloqueo(@RequestBody BloqueoHorario bloqueo) {
-        BloqueoHorario nuevo = servicioBloqueo.crearBloqueo(bloqueo);
-        return ResponseEntity.ok(nuevo);
+    public ResponseEntity<?> crearBloqueo(
+            @RequestBody BloqueoHorario bloqueo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+        if (fechaFin != null) {
+            List<BloqueoHorario> creados = servicioBloqueo.crearBloqueoRango(bloqueo, fechaFin);
+            return ResponseEntity.ok(creados);
+        } else {
+            BloqueoHorario nuevo = servicioBloqueo.crearBloqueo(bloqueo);
+            return ResponseEntity.ok(nuevo);
+        }
     }
 
     // DELETE - Eliminar bloqueo (solo ADMIN)
