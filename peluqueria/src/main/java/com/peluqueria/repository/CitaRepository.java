@@ -45,4 +45,11 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
                         @Param("horaInicio") LocalTime horaInicio,
                         @Param("horaFin") LocalTime horaFin);
 
+        @Query("SELECT SUM(c.horarioSemanal.servicio.precio) FROM Cita c " +
+                        "WHERE c.fecha BETWEEN :inicio AND :fin AND c.estado <> 'CANCELADA'")
+        Double sumingresosSemana(@Param("inicio") LocalDate inicio, @Param("fin") LocalDate fin);
+
+        @Query("SELECT COUNT(DISTINCT c.cliente.id) FROM Cita c " +
+                        "WHERE c.fecha BETWEEN :inicio AND :fin AND c.estado <> 'CANCELADA'")
+        Long countClientesSemana(@Param("inicio") LocalDate inicio, @Param("fin") LocalDate fin);
 }

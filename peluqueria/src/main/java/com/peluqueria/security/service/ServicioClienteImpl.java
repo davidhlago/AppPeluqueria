@@ -39,6 +39,7 @@ public class ServicioClienteImpl implements ServicioCliente {
         cliente.setDireccion(detallesCliente.getDireccion());
         cliente.setGrupo(detallesCliente.getGrupo());
         cliente.setImagenBase64(detallesCliente.getImagenBase64());
+        cliente.setFichaTecnica(detallesCliente.getFichaTecnica());
         return clienteRepository.save(cliente);
     }
 

@@ -7,6 +7,7 @@ import java.util.Set;
 
 @Entity
 @DiscriminatorValue("CLIENTE")
+@SecondaryTable(name = "ficha_diagnostico", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id_cliente"))
 public class Cliente extends Usuario {
 
     private String telefono;
@@ -62,4 +63,12 @@ public class Cliente extends Usuario {
     // ✅ Getters y Setters NUEVOS para Imagen Base64
     public String getImagenBase64() { return imagenBase64; }
     public void setImagenBase64(String imagenBase64) { this.imagenBase64 = imagenBase64; }
+
+    @Lob
+    @Column(table = "ficha_diagnostico", name = "datos", columnDefinition = "LONGTEXT")
+    @com.fasterxml.jackson.annotation.JsonProperty("ficha_tecnica")
+    private String fichaTecnica;
+
+    public String getFichaTecnica() { return fichaTecnica; }
+    public void setFichaTecnica(String fichaTecnica) { this.fichaTecnica = fichaTecnica; }
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/citas")
@@ -136,6 +137,19 @@ public class CitaController {
     @GetMapping("/dias-disponibles")
     public ResponseEntity<List<Integer>> getDiasLaborables(@RequestParam Long idServicio) {
         return ResponseEntity.ok(citaService.obtenerDiasLaborablesPorServicio(idServicio));
+    }
+
+    @GetMapping("/estadisticas/semanales")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
+    public ResponseEntity<?> getEstadisticasSemanales(
+            @RequestParam(name = "inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(name = "fin") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin) {
+        Double ingresos = citaService.obtenerIngresosSemana(inicio, fin);
+        Long clientes = citaService.obtenerClientesSemana(inicio, fin);
+
+        return ResponseEntity.ok(Map.of(
+                "donacionesSemana", ingresos,
+                "clientesSemana", clientes));
     }
 
     // --- MANEJO DE EXCEPCIONES ---
