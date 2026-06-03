@@ -296,4 +296,16 @@ public class ServicioCitaImpl implements ServicioCita {
                 return 0;
         }
     }
+
+    @Override
+    public Double obtenerIngresosSemana(LocalDate inicio, LocalDate fin) {
+        Double total = citaRepository.sumingresosSemana(inicio, fin);
+        return total != null ? total : 0.0;
+    }
+
+    @Override
+    public Long obtenerClientesSemana(LocalDate inicio, LocalDate fin) {
+        Long count = citaRepository.countClientesSemana(inicio, fin);
+        return count != null ? count : 0L;
+    }
 }

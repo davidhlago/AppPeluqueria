@@ -1,11 +1,25 @@
 package com.peluqueria.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "tipo_usuario", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "usuarios")
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "rol",
+    visible = true,
+    defaultImpl = Usuario.class
+)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = Cliente.class, name = "CLIENTE"),
+    @JsonSubTypes.Type(value = Admin.class, name = "ADMIN"),
+    @JsonSubTypes.Type(value = Grupo.class, name = "GRUPO")
+})
 public class Usuario {
 
     @Id

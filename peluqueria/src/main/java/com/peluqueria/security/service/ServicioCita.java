@@ -8,13 +8,21 @@ import java.util.Map; // <--- IMPORTANTE
 
 public interface ServicioCita {
     Cita crearCita(Cita cita);
+
     Cita modificarCita(Long id, Cita cita);
+
     Cita gestionarEstadoCita(Long id, int opcion);
+
     void cancelarCita(Long id);
+
     List<Cita> obtenerTodas();
+
     List<Cita> obtenerPorGrupo(Long id);
+
     List<Cita> obtenerPorCliente(Long id);
+
     List<Cita> obtenerPorAlumno(Long id);
+
     Cita obtenerPorId(Long id);
 
     // Tus métodos existentes
@@ -22,5 +30,11 @@ public interface ServicioCita {
 
     // EL NUEVO MÉTODO PARA FLUTTER
     List<Map<String, Object>> obtenerHuecosPorServicioYFecha(Long idServicio, LocalDate fecha);
+
+    // Estadísticas
+    Double obtenerIngresosSemana(LocalDate inicio, LocalDate fin);
+
+    Long obtenerClientesSemana(LocalDate inicio, LocalDate fin);
+
     List<Integer> obtenerDiasLaborablesPorServicio(Long idServicio);
 }

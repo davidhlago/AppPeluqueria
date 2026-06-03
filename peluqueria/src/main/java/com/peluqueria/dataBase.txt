@@ -173,6 +173,19 @@ INSERT INTO `cliente` (`alergenos`, `direccion`, `observacion`, `telefono`, `id`
 
 -- --------------------------------------------------------
 
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `ficha_diagnostico`
+--
+
+CREATE TABLE `ficha_diagnostico` (
+  `id_cliente` bigint(20) NOT NULL,
+  `datos` longtext DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
 --
 -- Estructura de tabla para la tabla `favoritos_cliente_servicio`
 --
@@ -577,6 +590,12 @@ ALTER TABLE `favoritos_cliente_servicio`
   ADD KEY `FK39scp6u293vude2u446tkdrei` (`id_servicio`);
 
 --
+-- Indices de la tabla `ficha_diagnostico`
+--
+ALTER TABLE `ficha_diagnostico`
+  ADD PRIMARY KEY (`id_cliente`);
+
+--
 -- Indices de la tabla `grupo`
 --
 ALTER TABLE `grupo`
@@ -703,6 +722,12 @@ ALTER TABLE `cliente`
 ALTER TABLE `favoritos_cliente_servicio`
   ADD CONSTRAINT `FK2ln4kxlb6u8l8o58u8lcs46fa` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id`),
   ADD CONSTRAINT `FK39scp6u293vude2u446tkdrei` FOREIGN KEY (`id_servicio`) REFERENCES `servicio` (`id_servicio`);
+
+--
+-- Filtros para la tabla `ficha_diagnostico`
+--
+ALTER TABLE `ficha_diagnostico`
+  ADD CONSTRAINT `FK_ficha_cliente` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `grupo`
