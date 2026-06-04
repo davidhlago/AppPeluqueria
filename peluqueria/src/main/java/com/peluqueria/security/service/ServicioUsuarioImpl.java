@@ -4,9 +4,14 @@ import com.peluqueria.entity.Usuario;
 import com.peluqueria.entity.Cliente;
 import com.peluqueria.entity.Admin;
 import com.peluqueria.entity.Grupo;
+import com.peluqueria.entity.Cita;
+import com.peluqueria.entity.Valoracion;
 import com.peluqueria.repository.UsuarioRepository;
+import com.peluqueria.repository.CitaRepository;
+import com.peluqueria.repository.ValoracionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
@@ -14,6 +19,12 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private CitaRepository citaRepository;
+
+    @Autowired
+    private ValoracionRepository valoracionRepository;
 
     @Override
     public List<Usuario> obtenerTodosLosUsuarios() {
@@ -58,8 +69,23 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
     }
 
     @Override
+    @Transactional
     public void eliminarUsuario(Long id) {
-        usuarioRepository.deleteById(id);
+        Usuario usuario = usuarioRepository.findById(id).orElse(null);
+        if (usuario != null) {
+            if (usuario instanceof Cliente) {
+                // 1. Obtener todas las citas del cliente
+                List<Cita> citas = citaRepository.findByCliente_Id(id);
+                for (Cita cita : citas) {
+                    // 2. Eliminar valoraciones asociadas a cada cita
+                    List<Valoracion> valoraciones = valoracionRepository.findByCita(cita);
+                    valoracionRepository.deleteAll(valoraciones);
+                }
+                // 3. Eliminar las citas
+                citaRepository.deleteAll(citas);
+            }
+            usuarioRepository.delete(usuario);
+        }
     }
 
     @Override

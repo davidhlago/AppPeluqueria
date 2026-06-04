@@ -64,6 +64,7 @@ public class SecurityConfig {
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/servicios/**").permitAll()
                         .requestMatchers("/api/servicios/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/tipos-servicio/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());
