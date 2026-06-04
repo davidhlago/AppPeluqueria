@@ -162,6 +162,24 @@ INSERT INTO `favoritos_cliente_servicio` (`id_cliente`, `id_servicio`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `ficha_diagnostico`
+--
+
+CREATE TABLE `ficha_diagnostico` (
+  `id_cliente` bigint(20) NOT NULL,
+  `datos` longtext DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `ficha_diagnostico`
+--
+
+INSERT INTO `ficha_diagnostico` (`id_cliente`, `datos`) VALUES
+(15, '{"fechaVisita":"2026-06-01","frecuenciaLavado":"","productosUtilizados":"","cueroDescamacion":false,"cueroGrasa":false,"cueroCaida":false,"cueroPicor":false,"cueroNormal":true,"cueroSeco":false,"cueroGraso":true,"cabelloLiso":false,"cabelloOndulado":true,"cabelloRizado":false,"alteraciones":"","colorMatiz":"","canas":"","grosor":"","longitud":"","observaciones":"","palpacionNormal":false,"palpacionHumedo":false,"palpacionUntuoso":false,"presionNormal":false,"presionDeficiente":false,"movilizacionAdherencia":false,"movilizacionNoAdherencia":false,"jaquetPositivo":false,"jaquetNegativo":true,"saboraudPositivo":false,"saboraudNegativo":false,"papelPositivo":false,"papelNegativo":false,"texturaFinas":false,"texturaGruesas":false,"puntasAbiertas":false,"puntasCerradas":true,"pullPositivo":true,"pullNegativo":false,"deslizarAlta":false,"deslizarMedia":false,"deslizarNinguna":false,"corneoMuyDes":false,"corneoDes":false,"corneoNormal":false,"corneoMuyHid":false,"seboSeco":false,"seboNormal":false,"seboGraso":false,"seboSeborrea":false,"phNormal":false,"phAlto":false,"phBajo":false,"woodAmarillo":false,"woodVioClaro":false,"woodVioOscuro":true,"woodAzul":false,"woodBlanco":false,"woodOscuro":false,"woodDebil":true,"microSueltas":false,"microPegadas":false,"microEritema":false,"microGrasa":false,"microMini":true,"microObstruccion":false,"microDebil":true,"obsAparatologia":"","anomTricorrexis":false,"anomMonilethrix":false,"anomPiliTorti":false,"anomPiliBifur":false,"anomTricInvag":false,"anomTricotio":false,"danoCuticula":false,"danoPuntas":false,"danoTricoNodosa":false,"danoTricoclasia":false,"danoTriconodosis":false,"danoTricolomania":false,"danoBayoneta":false,"danoEnfundado":false,"obsMicrovisor":"","tricoFrontAnagena":"","tricoFrontCatagena":"","tricoFrontTelogena":"","tricoTempIzqAnagena":"","tricoTempIzqCatagena":"","tricoTempIzqTelogena":"","tricoTempDchoAnagena":"","tricoTempDchoCatagena":"","tricoTempDchoTelogena":"","tricoParietalAnagena":"","tricoParietalCatagena":"","tricoParietalTelogena":"","tricoOccipitalAnagena":"","tricoOccipitalCatagena":"","tricoOccipitalTelogena":"","obsTricograma":"","seguimiento":[]}');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `grupo`
 --
 
@@ -537,6 +555,12 @@ ALTER TABLE `favoritos_cliente_servicio`
   ADD KEY `FK39scp6u293vude2u446tkdrei` (`id_servicio`);
 
 --
+-- Indices de la tabla `ficha_diagnostico`
+--
+ALTER TABLE `ficha_diagnostico`
+  ADD PRIMARY KEY (`id_cliente`);
+
+--
 -- Indices de la tabla `grupo`
 --
 ALTER TABLE `grupo`
@@ -663,6 +687,12 @@ ALTER TABLE `cliente`
 ALTER TABLE `favoritos_cliente_servicio`
   ADD CONSTRAINT `FK2ln4kxlb6u8l8o58u8lcs46fa` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id`),
   ADD CONSTRAINT `FK39scp6u293vude2u446tkdrei` FOREIGN KEY (`id_servicio`) REFERENCES `servicio` (`id_servicio`);
+
+--
+-- Filtros para la tabla `ficha_diagnostico`
+--
+ALTER TABLE `ficha_diagnostico`
+  ADD CONSTRAINT `FK_ficha_cliente` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `grupo`
