@@ -94,6 +94,89 @@ public class AuthController {
     }
 
     // ---------------- RECUPERAR CONTRASEÑA ----------------
+    @PostMapping("/google")
+    public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String> request) {
+        try {
+            String token = request.get("idToken");
+            if (token == null || token.isBlank()) {
+                token = request.get("token");
+            }
+            if (token == null || token.isBlank()) {
+                token = request.get("tokenId");
+            }
+
+            if (token == null || token.isBlank()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new MessageResponse("Error: Token de Google no enviado."));
+            }
+
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+                    new NetHttpTransport(),
+                    GsonFactory.getDefaultInstance())
+                    .setAudience(Collections.singletonList(googleClientId))
+                    .build();
+
+            GoogleIdToken googleIdToken = verifier.verify(token);
+            if (googleIdToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new MessageResponse("Error: Token de Google inválido."));
+            }
+
+            GoogleIdToken.Payload payload = googleIdToken.getPayload();
+            String email = payload.getEmail();
+            String nombreGoogle = request.getOrDefault("nombre", (String) payload.get("name"));
+            String apellidosGoogle = request.getOrDefault("apellidos", "");
+
+            if (email == null || email.isBlank()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new MessageResponse("Error: No se pudo obtener email desde Google."));
+            }
+
+            Usuario usuario = usuarioRepository.findByEmail(email);
+            if (usuario == null) {
+                Cliente cliente = new Cliente();
+                cliente.setEmail(email);
+                cliente.setNombre((nombreGoogle == null || nombreGoogle.isBlank()) ? "Usuario Google" : nombreGoogle);
+                cliente.setApellidos(apellidosGoogle == null ? "" : apellidosGoogle);
+                cliente.setRol("CLIENTE");
+                cliente.setUsername(generarUsernameUnico(email));
+                cliente.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+
+                usuario = usuarioRepository.save(cliente);
+            }
+
+            String rol = (usuario.getRol() == null || usuario.getRol().isBlank()) ? "CLIENTE" : usuario.getRol();
+            String jwt = jwtUtils.generarToken(usuario.getUsername(), rol);
+
+            return ResponseEntity.ok(new JwtResponse(
+                    jwt,
+                    usuario.getId(),
+                    usuario.getNombre(),
+                    usuario.getApellidos(),
+                    usuario.getUsername(),
+                    rol));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponse("Error validando Google Sign-In: " + e.getMessage()));
+        }
+    }
+
+    private String generarUsernameUnico(String email) {
+        String base = email.split("@")[0].replaceAll("[^a-zA-Z0-9._-]", "");
+        if (base.isBlank()) {
+            base = "usuario_google";
+        }
+
+        String username = base;
+        int i = 1;
+        while (usuarioRepository.findByUsername(username) != null) {
+            username = base + "_" + i;
+            i++;
+        }
+        return username;
+    }
+
+    // ---------------- RECUPERAR CONTRASEÑA ----------------
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
         String email = request.get("email");
