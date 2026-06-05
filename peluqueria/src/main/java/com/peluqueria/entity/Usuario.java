@@ -1,11 +1,25 @@
 package com.peluqueria.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "tipo_usuario", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "usuarios")
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "rol",
+    visible = true,
+    defaultImpl = Usuario.class
+)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = Cliente.class, name = "CLIENTE"),
+    @JsonSubTypes.Type(value = Admin.class, name = "ADMIN"),
+    @JsonSubTypes.Type(value = Grupo.class, name = "GRUPO")
+})
 public class Usuario {
 
     @Id
@@ -24,6 +38,9 @@ public class Usuario {
     private String password;
     private String rol;
 
+    @Column(name = "reset_token")
+    private String resetToken;
+
     public Usuario() {}
 
     public Usuario(String nombre, String apellidos, String username, String email, String password) {
@@ -38,7 +55,6 @@ public class Usuario {
         this(nombre, apellidos, username, email, password);
         this.rol = rol;
     }
-
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -60,4 +76,12 @@ public class Usuario {
 
     public String getRol() { return rol; }
     public void setRol(String rol) { this.rol = rol; }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
 }

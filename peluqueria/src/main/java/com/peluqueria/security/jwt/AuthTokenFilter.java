@@ -35,15 +35,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
-
-        String path = request.getRequestURI();
-
-        if (path.startsWith("/api/auth/")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
 
         try {
             String jwt = parseJwt(request);
@@ -54,10 +47,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                GrantedAuthority authority = new org.springframework.security.core.authority.SimpleGrantedAuthority(rol);
+                GrantedAuthority authority = new org.springframework.security.core.authority.SimpleGrantedAuthority(
+                        rol);
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, List.of(authority));
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, List.of(authority));
 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
@@ -81,4 +75,5 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     }
 }
 
-//filtro intercepta cada petición, extrae y valida el JWT y, si es correcto, autentica al usuario en Spring Security
+// filtro intercepta cada petición, extrae y valida el JWT y, si es correcto,
+// autentica al usuario en Spring Security

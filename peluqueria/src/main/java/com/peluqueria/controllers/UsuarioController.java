@@ -28,26 +28,30 @@ public class UsuarioController {
     // ----------------------------------------------------------------------------------
     // 1. ENDPOINT DEDICADO: /api/usuarios/me (PERFIL DEL USUARIO AUTENTICADO)
     // ----------------------------------------------------------------------------------
-    // Devuelve un ÚNICO objeto (ResponseEntity<Usuario>), asegurando la corrección en C#.
+    // Devuelve un ÚNICO objeto (ResponseEntity<Usuario>), asegurando la corrección
+    // en C#.
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Usuario> obtenerPerfilUsuarioActual(Authentication authentication) {
         // 1. Obtener los detalles del usuario a partir del token JWT
-        //    (Spring ya ha verificado el token y ha inyectado el objeto UserDetails).
+        // (Spring ya ha verificado el token y ha inyectado el objeto UserDetails).
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        // 2. Usar el ID (o el username, si lo prefieres) para obtener el objeto completo de la DB.
+        // 2. Usar el ID (o el username, si lo prefieres) para obtener el objeto
+        // completo de la DB.
         Long idUsuario = userDetails.getId();
 
         try {
             Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
 
-            // 🚨 IMPORTANTE: Devolver ResponseEntity.ok(usuario) devuelve UN SOLO OBJETO, no un array.
+            // 🚨 IMPORTANTE: Devolver ResponseEntity.ok(usuario) devuelve UN SOLO OBJETO,
+            // no un array.
             // Esto corrige el parseo JSON en tu aplicación C#.
             return ResponseEntity.ok(usuario);
         } catch (NoSuchElementException e) {
-            // Esto solo ocurriría si el token es válido pero el usuario fue borrado de la DB.
+            // Esto solo ocurriría si el token es válido pero el usuario fue borrado de la
+            // DB.
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
@@ -56,10 +60,11 @@ public class UsuarioController {
     // 2. ENDPOINT /api/usuarios (SOLO PARA ADMINS: LISTA COMPLETA)
     // ----------------------------------------------------------------------------------
     // Se ajusta la lógica para que solo los ADMIN puedan obtener la lista completa,
-    // y se elimina la lógica de devolver solo un usuario si no es admin (ya cubierto por /me).
+    // y se elimina la lógica de devolver solo un usuario si no es admin (ya
+    // cubierto por /me).
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')") // Solo ADMINs pueden ver la lista completa
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')") // Solo ADMINs y GRUPO pueden ver la lista completa
     public List<Usuario> obtenerTodosLosUsuarios() {
         return servicioUsuario.obtenerTodosLosUsuarios();
     }
@@ -69,7 +74,7 @@ public class UsuarioController {
     // ----------------------------------------------------------------------------------
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN') or #id == authentication.principal.id")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO') or #id == authentication.principal.id")
     public ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable Long id) {
         try {
             Usuario usuario = servicioUsuario.obtenerUsuarioPorId(id);
@@ -80,8 +85,9 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN') or #id == authentication.principal.id")
-    public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @Valid @RequestBody Usuario detallesUsuario) {
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO') or #id == authentication.principal.id")
+    public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id,
+            @Valid @RequestBody Usuario detallesUsuario) {
         try {
             Usuario usuarioActualizado = servicioUsuario.actualizarUsuario(id, detallesUsuario);
             return ResponseEntity.ok(usuarioActualizado);
@@ -91,7 +97,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         try {
             servicioUsuario.eliminarUsuario(id);
@@ -102,7 +108,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/buscar/email")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GRUPO')")
     public ResponseEntity<List<Usuario>> buscarPorEmail(@RequestParam String texto) {
         List<Usuario> usuarios = servicioUsuario.buscarPorEmail(texto);
         return usuarios.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(usuarios);
