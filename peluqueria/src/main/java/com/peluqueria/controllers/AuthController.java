@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -234,6 +235,20 @@ public class AuthController {
             cliente.setRol("CLIENTE");
             usuarioRepository.save(cliente);
             System.out.println("Cliente registrado con éxito: " + cliente.getUsername());
+
+            // Enviar email de bienvenida de forma segura en segundo plano (asíncrono)
+            CompletableFuture.runAsync(() -> {
+                try {
+                    emailService.enviarEmailBienvenida(
+                        cliente.getEmail(),
+                        cliente.getNombre() + " " + cliente.getApellidos(),
+                        cliente.getUsername()
+                    );
+                } catch (Exception mailEx) {
+                    System.err.println("❌ Error al enviar email de bienvenida a " + cliente.getEmail() + ": " + mailEx.getMessage());
+                }
+            });
+
             return ResponseEntity.ok(new MessageResponse("Cliente registrado correctamente."));
         } catch (Exception e) {
             System.err.println("Error al guardar cliente: " + e.getMessage());
